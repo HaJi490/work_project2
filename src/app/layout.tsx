@@ -32,7 +32,7 @@ export default function RootLayout({
         {/* 카카오맵 스크립트 삽입 */}
         <script
           type="text/javascript"
-          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_JS_KEY}&libraries=services`}
+          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_JSKEY}&autoload=false&libraries=services`}
           async
         ></script>
       </head>

@@ -1,0 +1,21 @@
+.mainContainer{
+    /* width: 100%;
+    height: 100%; */
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100vh - 80px); 
+    /* nav 높이 빼기 */
+}
+
+.listSection{
+    border-bottom: 1px solid #232323;
+    padding: 0 2 0 2;
+    cursor: pointer;
+    
+}
+
+.listSection:hover{
+    background-color: rgba(79, 169, 105, 0.2);
+    
+}

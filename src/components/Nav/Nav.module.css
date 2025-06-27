@@ -1,0 +1,38 @@
+.navContainer{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    border-bottom: 1px solid #F2F2F2;
+    padding: 0 60px 0 60px; ;
+}
+
+/* .logoBox{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+} */
+
+.menu{
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    font-weight: 500;
+}
+
+.authBox{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.authBox span{
+    font-size: 24px;
+    color: #666;
+}
