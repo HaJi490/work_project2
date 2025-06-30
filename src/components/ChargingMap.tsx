@@ -7,7 +7,7 @@ interface ChargingMapProps {
     name: string;
     lat: number;
     lng: number;
-    available: boolean;
+    availableCnt: number;
   }[];
 //   onMapReady?: (panTo: (lat: number, lng: number) => void) => void;
 }
@@ -69,7 +69,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                         position: pos,
                         title: mark.name,
                         image: 
-                        mark.available ? 
+                        mark.availableCnt == 0 ? 
                             undefined :
                             new window.kakao.maps.MarkerImage(
                                 new window.kakao.maps.Size(30, 40)
@@ -88,7 +88,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                             padding: 2px 6px;
                             border-radius: 12px;
                         ">
-                           2
+                           ${availableCnt}
                         </div>
                         `;
                     const customOverlay = new window.kakao.maps.CustomOverlay({

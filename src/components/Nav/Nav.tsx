@@ -9,7 +9,7 @@ export default function Nav() {
     <div className={style.navContainer}>
       {/* 로고 */}
       <div className={style.logoBox}>
-        <Image src="/gwLogo.png" alt='gw로고' width={150} height={80} />
+        <Image src="/gwLogo.png" alt='gw로고' width={150} height={80} priority/>
       </div>
       {/* 중앙 메뉴 */}
       <ul className={style.menu}>

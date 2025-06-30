@@ -3,125 +3,68 @@
 import style from './home.module.css';
 import ChargingMap from "../components/ChargingMap";
 import Nav from "../components/Nav/Nav";
+import FilterModal from "../components/Filter/FilterModal"
+
 import axios from "axios";
-import { ChargingStationRequestDto, ChargingStationResponseDto } from "@/dto";
 import { useEffect, useState } from "react";
+
+import { ChargingStationRequestDto } from "@/dto";
+import { ChargingStationResponseDto } from '@/dto';
+
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 
 export default function Home() {
   const[list, setList] = useState<ChargingStationResponseDto[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  const requestBody: ChargingStationRequestDto = {
-    carModel: 'Hyundai Ioniq 5',
-    batteryLevel: 30.5,
-    currentLocation: { latitude: 37.5665, longitude: 126.9780 },
-    destination: { latitude: 37.3943, longitude: 127.1115 },
-    searchRadiusKm: 15,
-    connectorTypes: ['CCS1', 'CHAdeMO'],
-    chargingSpeeds: {
-      min: 100,
-      max: 200
-    },
-    availableOnly: true,
-    isOpen: true,
-    freeParking: false,
-    membership: ['휴맥스EV', 'EVinfra'],
-    providers: ['Kepco']
-  }
-
-  const respBody: ChargingStationResponseDto = {
-    "chargingStations": [
-    {
-      "stationId": "ST123456",
-      "name": "강남 고속터미널 충전소",
-      "location": {
-        "latitude": 37.5041,
-        "longitude": 127.0046
-      },
-      "distanceKm": 5.2,
-      "connectors": [
-        {
-          "type": "CCS1",
-          "speeds": {
-            "min":150,
-            "max":1000 
-          }, // 정확한 단위?? 완속/급속?
-          "available": true
-        }
-      ],
-      "isOpen": true,
-      "freeParking": false,
-      "membership": ['휴맥스EV', 'EVinfra'],
-      "providers": "Kepco"
-    },
-    {
-      "stationId": "ST654321",
-      "name": "양재 시민의 숲 주차장 충전소",
-      "location": {
-        "latitude": 37.4704,
-        "longitude": 127.0385
-      },
-      "distanceKm": 8.1,
-      "connectors": [
-        {
-          "type": "CHAdeMO",
-          "speeds":{
-            min: 100,
-            max: 200
-          },
-          "available": true
-        },
-        {
-          "type": "CCS1",
-          "speeds": {
-            min: 100,
-            max: 200
-          },
-          "available": false
-        }
-      ],
-      "isOpen": true,
-      "freeParking": true,
-      "membership": ['휴맥스EV', 'EVinfra'],
-      "providers": "Tesla"
-    }
-  ]
-  }
-
-
-  // 처음 접속했을때 req
-  useEffect(()=>{}, [])
-  const firstpgReq = async() =>{
-    try{
-      await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}/map/post/stations`, requestBody);
-    } catch(err) {
-      console.error("firstpgReq error: ", err)
-    }
-  }
-  // firstpgReq();
+  // const requestBody: ChargingStationRequestDto = {
+  //   carModel: 'Hyundai Ioniq 5',
+  //   batteryLevel: 30.5,
+  //   currentLocation: { latitude: 37.5665, longitude: 126.9780 },
+  //   destination: { latitude: 37.3943, longitude: 127.1115 },
+  //   searchRadiusKm: 15,
+  //   connectorTypes: ['CCS1', 'CHAdeMO'],
+  //   chargingSpeeds: {
+  //     min: 100,
+  //     max: 200
+  //   },
+  //   availableOnly: true,
+  //   isOpen: true,
+  //   freeParking: false,
+  //   membership: ['휴맥스EV', 'EVinfra'],
+  //   providers: ['Kepco']
+  // }
 
   // 충전소정보 resp
   useEffect(()=>{
     const stationInfo = async()=>{
       try{
-        const res = await axios.get<ChargingStationResponseDto>(`http://${process.env.NEXT_PUBLIC_BACKIP}/map/post/stations`);
-        
-        setList(Array.isArray(res.data) ? res.data : []);
-        console.log(res.data); 
+        const res = await axios.post<ChargingStationResponseDto[]>(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`, 
+          {
+            "lat":35.231944,
+            "lon":129.083333
+          }
+        );
+        const data = res.data;
+
+        setList(Array.isArray(data) ? data : []);
+        console.log(data); 
       } catch(err){
         console.error("stationInfo error: ", err);
         setList([]);
       }
     }
+
+    stationInfo();
   },[]) //
 
   // 받은 list markers에 넣기
-  const markers = respBody.chargingStations.map((item) => ({
-    id: item.stationId,
-    name: item.name,
-    lat: item.location.latitude,
-    lng: item.location.longitude,
-    available: item.connectors.some(conn => conn.available),
+  const markers = list.map((item) => ({
+    id: item.statId,
+    name: item.statNm,
+    lat: item.lat,
+    lng: item.lng,
+    availableCnt: item.chargeNum,
   }
   ))
       
@@ -134,18 +77,20 @@ export default function Home() {
         <div className="w-3/10 max-w-100 h-full p-10 bg-white z-10 shadow-md">
           <div className='flex flex-row justify-between'>
             <h3 className=" font-semibold mb-4" style={{color:"#4FA969"}}> 충전소 찾기</h3>
-            <span className='text-[24px]' style={{color:'#666'}}><HiOutlineAdjustmentsHorizontal/></span>
+            <button onClick={()=>setIsFilterOpen(true)}
+              className='text-[24px] cursor-pointer' style={{color:'#666'}}><HiOutlineAdjustmentsHorizontal/></button>
+              <FilterModal isOpen={isFilterOpen} onClose={()=>setIsFilterOpen(false)} />
           </div>
           <input type="text" placeholder="검색" className="w-full p-2 border rounded mb-4"/>
           <h4>충전소 목록</h4>
           <ul>
-            {/* list.map */}
-            {respBody.chargingStations.map((item) => (
-              <li key={item.stationId} className={style.listSection}>
-                <h4 className='font-bold text-[19px]' style={{color:'#232323'}}>{item.name}</h4>
+            {list.map((item) => (
+              <li key={item.statId} className={style.listSection}>
+                <h4 className='font-bold text-[19px]' style={{color:'#232323'}}>{item.statNm}</h4>
+                <p className='text-[12px]' style={{color:'#666'}}>{item.addr}</p>
                 <div className='flex gap-3'>
-                  <p className='text-[12px]' style={{color:'#666'}}>{item.distanceKm}km</p>
-                  <p className='text-[12px]' style={{color:'#666'}}>{item.connectors.map(c => `${c.type}(${c.available ? '사용가능' : '사용불가'})`)}</p>
+                  <p className='text-[12px]' style={{color:'#666'}}>
+                    {item.parkingFree ? '무료주차, ' : ''} {item.limitYn ? '개방, ': ''} {item.chargeNum} / { item.totalChargeNum}</p>
                 </div>
               </li>
 

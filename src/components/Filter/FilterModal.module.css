@@ -1,0 +1,17 @@
+.filterList:hover{
+    cursor: pointer;
+}
+
+.filterList:focus{
+    font-weight: bold;
+    border-width: 0 0 3px 0;
+    border-color: #4FA969;
+}
+
+.propYn{
+    border: 1px solid #4FA969;
+    border-radius: 999px;
+    padding: 4px 10px;
+    color: #4FA969;
+}
+

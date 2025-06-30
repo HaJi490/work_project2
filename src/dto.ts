@@ -23,53 +23,78 @@ export interface ChargingStationRequestDto{
   providers: string[];  // 충전사
 }
 
-// 충전기 상세정보
-export interface ConnectorInfo {
-  type: string;
-  speeds: {
-    min: number;
-    max: number;
-  };
-  available: boolean;
+// 전기차충전소 응답dto
+// 충전소별
+export interface ChargingStationResponseDto {
+  statNm: string;          // 충전소 이름
+  statId: string;          // 충전소 ID
+  addr: string;            // 주소
+  lat: number;            
+  lng: number;            
+  parkingFree: boolean;    // 주차 무료 여부
+  limitYn: boolean;        // 이용 제한 여부
+  totalChargeNum: number;  // 전체 충전기 수
+  chargeNum: number;       // 사용 가능한 충전기 수
+  enabledCharger: number | null; // (예비용 필드, 현재 null)
+  busiId: string;          // 사업자 코드
+  busiNm: string;          // 사업자 이름 (충전사)
 }
-// export interface ChargerInfo{
-//     resultCode: string;             // 예: "00"
-//     resultMsg: string;              // 예: "성공"
-//     chargeTp: string;               // 예: "1" (완속/급속 구분 등)
-//     cpTp: string;                   // 예: "5" (충전기 타입)
-//     csId: string;                   // 충전소 ID
-//     csNm: string;                   // 충전소 이름
-//     cpStat: string;                 // 충전기 상태 코드
-//     addr: string;                   // 주소
-//     lat: number;                    // 위도
-//     longi: number;                  // 경도
-//     startUpdatetime: string;        // ISO 날짜 문자열
+
+// export interface ChargingStationResponseDto {
+//   statNm: string;
+//   statId: string;
+//   chgerId: string;
+//   chgerType: string;
+//   addr: string;
+//   addrDetail: string | null;
+//   location: string | null;
+//   useTime: string;
+//   lat: string;
+//   lng: string;
+//   busiId: string;
+//   bnm: string;
+//   busiNm: string;
+//   busiCall: string;
+//   stat: string;
+//   statUpdDt: string;
+//   lastTsdt: string;
+//   lastTedt: string;
+//   nowTsdt: string;
+//   powerType: string;
+//   output: string;
+//   method: string;
+//   zcode: string;
+//   zscode: string;
+//   kind: string;
+//   kindDetail: string;
+//   parkingFree: string;
+//   note: string;
+//   limitYn: string;
+//   limitDetail: string;
+//   delYn: string;
+//   delDetail: string;
+//   trafficYn: string;
+//   year: string;
+//   floorNum: string;
+//   floorType: string;
 // }
 
-// // 전기차충전소 응답dto
-// export interface ChargingStationResponseDto{
-//     cpNums: number;
-//     totalNum: number;
-//     evStoreResults: ChargerInfo[];
-//}
+// // 🔹 items 객체 안의 item 배열
+// export interface ItemsWrapper {
+//   item: ChargingStationResponseDto[];
+// }
+
+// // 🔹 전체 응답 타입
+// export interface ChargerResponse {
+//   resultMsg: string;
+//   totalCount: number;
+//   items: ItemsWrapper;
+//   pageNo: number;
+//   resultCode: string;
+//   numOfRows: number;
+// }
 
 
-export interface ChargingStationResponseDto{
-    chargingStations:{
-        stationId: string;
-        name: string;
-        location:{
-            latitude: number;
-            longitude: number;
-        }
-        distanceKm: number;
-        connectors: ConnectorInfo[];
-        isOpen: boolean;
-        freeParking: boolean;
-        membership: string[];
-        providers: string;
-    }[];
-}
 
 
 
