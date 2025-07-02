@@ -18,6 +18,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
 
     // 1. 현재위치 가져오기
     useEffect(()=>{
+        console.log('맵에서 가져옴:',markers);
         navigator.geolocation.getCurrentPosition((position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
@@ -69,9 +70,12 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                         position: pos,
                         title: mark.name,
                         image: 
-                        mark.availableCnt == 0 ? 
-                            undefined :
+                        mark.availableCnt === 0 ?                                                   // FIXME
                             new window.kakao.maps.MarkerImage(
+                                '/marker1.png',
+                                new window.kakao.maps.Size(30, 40)) :
+                            new window.kakao.maps.MarkerImage(
+                                '/marker1.png',
                                 new window.kakao.maps.Size(30, 40)
                             ),
                     })
@@ -88,7 +92,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                             padding: 2px 6px;
                             border-radius: 12px;
                         ">
-                           ${availableCnt}
+                           ${mark.availableCnt}
                         </div>
                         `;
                     const customOverlay = new window.kakao.maps.CustomOverlay({

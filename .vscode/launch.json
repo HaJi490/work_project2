@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // 👉 프론트엔드 디버깅 (Next.js)
+      "name": "Debug Next.js Client",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend", // 프론트 디렉토리
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      // 👉 백엔드 디버깅 (예: Express 또는 Spring Boot)
+      "name": "Debug Backend (Node.js 예시)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/index.js", // 백엔드 진입 파일
+      "cwd": "${workspaceFolder}/backend",
+      "outFiles": ["${workspaceFolder}/backend/dist/**/*.js"],
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug Client + Backend",
+      "configurations": ["Debug Next.js Client", "Debug Backend (Node.js 예시)"]
+    }
+  ]
+}
