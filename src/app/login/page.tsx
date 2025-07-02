@@ -31,7 +31,7 @@ export default function page() {
         localStorage.setItem("accessToken", token);
       }
 
-      //route.push('/');
+      route.push('/');
     } catch(error: any){
       console.error("로그인 에러: ", error.response || error)
       alert(error.response?.data?.message || "다시 로그인을 시도해주세요.")

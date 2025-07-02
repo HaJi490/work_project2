@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import style from './FilterModal.module.css'
+import SpeedSlider from "../Slider/SpeedSlider"
 
 interface Props{
     isOpen: boolean;
@@ -36,7 +37,7 @@ export default function Filter({isOpen, onClose}: Props) {
             </button>
 
             <h2 className="mb-4 font-bold">필터</h2>
-            {/* 탭메뉴  */}
+            {/* 탭메뉴 */}
             <div className="flex gap-4 border-b pb-2 mb-4" style={{borderColor:'#f2f2f2'}}>
                 {/* 사용가능, 개방여부, 무료주차 */}
                 {/* 탐색반경, 충전속도, 커넥터 타입 */}
@@ -50,24 +51,34 @@ export default function Filter({isOpen, onClose}: Props) {
             </div>
             {/* 설정 */}
             <h4 className="mb-2" style={{color:'#666'}}>속성</h4>
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-2 mb-4">
                 <button className={style.propYn}>충전가능</button>
                 <button className={style.propYn}>개방여부</button>
                 <button className={style.propYn}>무료주차</button>
             </div>
-            <h4 className="mb-2" style={{color:'#666'}}>탐색반경</h4>
+            <h4 className="mb-2" style={{color:'#666'}}>충전속도</h4>
             <div className="mb-4">
-                
-                {/* 트랙 */}
-                <div className="top-1/2 left-0 right-0 h-1 bg-gray-300 rounded-full -translate-y-1/2" />
+                <SpeedSlider />
             </div>
 
-            <h4 className="mb-2" style={{color:'#666'}}>충전속도</h4>
-            <div className="flex gap-4 mb-4">
+            <h4 className="mb-2" style={{color:'#666'}}>커넥터</h4>
+            <div className="flex flex-wrap gap-2 mb-4">
                 <button className={style.propYn}>완속</button>
-                <button className={style.propYn}>중속</button>
-                <button className={style.propYn}>급속</button>
+                <button className={style.propYn}>DC콤보</button>
+                <button className={style.propYn}>차데모</button>
+                <button className={style.propYn}>AC3상</button>
+                <button className={style.propYn}>이동형</button>
+                <button className={style.propYn}>무선충전</button>
+                <button className={style.propYn}>데스티네이션</button>
+                <button className={style.propYn}>수퍼차저V2</button>
+                <button className={style.propYn}>수퍼차저V3</button>
             </div>
+            <h4 className="mb-2" style={{color:'#666'}}>멤버십</h4>
+            <div className="grid grid-cols-2 mb-4">
+                <input type="checkbox" value='에버온' />
+
+            </div>
+            
         </div>
     </div>
   )

@@ -2,44 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 interface ChargingMapProps {
-  markers: {
+  markers: MarkerType[];
+  myPos: [number, number] | null;
+}
+
+type MarkerType= {   
     id: string;
     name: string;
     lat: number;
     lng: number;
     availableCnt: number;
-  }[];
-//   onMapReady?: (panTo: (lat: number, lng: number) => void) => void;
-}
+};
 
-export default function ChargingMap({markers} : ChargingMapProps) {
+export default function ChargingMap({markers, myPos} : ChargingMapProps) {
     const mapRef = useRef<any>(null); // map객체 저장용
-    const [myPos, setMyPos] = useState<[Number, number] | null>(null); // 현재위치 저장용
+    
 
-    // 1. 현재위치 가져오기
+    // 1. 현재위치로 map 로드 및 현재위치로
     useEffect(()=>{
-        console.log('맵에서 가져옴:',markers);
-        navigator.geolocation.getCurrentPosition((position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            setMyPos([lat, lng]);
-
-        },
-        (error) => {
-            console.error("위치 정보를 가져오지 못했습니다.", error);
-            // 위치 못가져오면 기본값 서울시청
-            setMyPos([37.5665, 126.9780]);
-        });
-    },[]);
-
-    // 2. 현재위치로 map 로드
-    useEffect(()=>{
-        if(!myPos) return; // 위치가 없으면 실행x
+        if(!myPos ) return; // 위치가 없으면 실행x
 
         if(window.kakao && window.kakao.maps){
             window.kakao.maps.load(() => {
                 const mapContainer = document.getElementById("map");
-                if (!mapContainer) return;
+                if (!mapContainer || !window.kakao || !window.kakao.maps ) return;  // dom(#map)과 sdk(kakaoMap) 로드여부체크
     
                 const mapOption = {
                 center: new window.kakao.maps.LatLng(myPos[0], myPos[1]),
@@ -49,12 +35,6 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                 const map = new window.kakao.maps.Map(mapContainer, mapOption);
                 mapRef.current = map; // map 저장
 
-                // // 부모에 panTo 함수 전달
-                // onMapReady?.((lat: number, lng: number) => {
-                //     const moveLatLng = new window.kakao.maps.LatLng(lat, lng);
-                //     map.panTo(moveLatLng);  // 지도 부드럽게 이동
-                // }) 
-    
                 // 현재 위치 마커 찍기
                 new window.kakao.maps.Marker({
                 map,
@@ -62,11 +42,23 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                 });
 
 
-                // 충전소 위치 표시
+                // 💡 강제로 리사이즈 발생 (화면 제대로 갱신되도록)
+                setTimeout(() => {
+                map.relayout();
+                }, 100);
+            });
+        }
+        }, [myPos]);
+
+        // 2. 충전소 마커 그리기(마커안와도 지도는 그릴 수 있게 분리)
+        useEffect(()=>{
+            if(!mapRef.current || markers.length === 0) return;
+            
+                  // 충전소 위치 표시
                 markers.forEach(mark => {
                     const pos = new window.kakao.maps.LatLng(mark.lat, mark.lng);
                     const marker = new window.kakao.maps.Marker({
-                        map: map,
+                        map: mapRef.current,
                         position: pos,
                         title: mark.name,
                         image: 
@@ -101,7 +93,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                         yAnchor: 1.5,
                         zIndex: 3,
                         });
-                    customOverlay.setMap(map);
+                    customOverlay.setMap(mapRef.current);
 
                     // 마커 눌렀을때 info
                     const infowindow = new window.kakao.maps.InfoWindow({
@@ -109,22 +101,11 @@ export default function ChargingMap({markers} : ChargingMapProps) {
                     });
 
                     window.kakao.maps.event.addListener(marker, 'click', function() {
-                    infowindow.open(map, marker);
+                    infowindow.open(mapRef.current, marker);
                     });
                 })
 
-                
-
-    
-                // 💡 강제로 리사이즈 발생 (화면 제대로 갱신되도록)
-                setTimeout(() => {
-                map.relayout();
-                }, 100);
-            });
-        }
-        }, [myPos, markers]);
-
-   
+        },[markers])
 
         // 키워드로 주소검색(강남역)
         // const ps = new window.kakao.maps.services.Places();
@@ -143,13 +124,7 @@ export default function ChargingMap({markers} : ChargingMapProps) {
 
   return (
     <div style={{width: "100%", height: "100%"}}>
-        <div id="map" style={{ width: "100%", height: "100%" }}>
-            {/* 마커 뿌리기
-            {markers.map(marker => (
-                <div key={marker.id}>{marker.name}</div>
-            ))} */}
-        </div>
-
+        <div id="map" style={{ width: "100%", height: "100%" }}/>
     </div>
   )
 }

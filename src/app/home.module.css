@@ -19,3 +19,10 @@
     background-color: rgba(79, 169, 105, 0.2);
     
 }
+
+.searchResult{
+    cursor: pointer;
+    margin: 3px 4px ;
+    border: 1px solid;
+    padding: 10px;
+}
