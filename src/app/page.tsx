@@ -1,10 +1,10 @@
 'use client'
 
 import axios from "axios";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
-import { ChargingStationRequestDto } from "@/dto";
-import { ChargingStationResponseDto } from '@/dto';
+import { ChargingStationRequestDto, ChargingStationResponseDto, MapQueryDto, CoordinatesDto } from '@/types/dto';
+import idTonm from '../db/busi_id.json'
 
 import style from './home.module.css';
 import ChargingMap from "../components/ChargingMap";
@@ -20,26 +20,104 @@ interface Place {
   y: string; // 위도 (latitude)
 }
 
+interface Filters {
+  lat: number;
+  lon: number;
+  radius: number;
+  canUse: boolean;
+  parkingFree: boolean;
+  limitYn: boolean;
+  chargerTypes: string[];
+  chargerComps: string[];
+  outputMin: number;
+  outputMax: number;
+}
+
 export default function Home() {
   const[list, setList] = useState<ChargingStationResponseDto[]>([]);  // resp
   const [isFilterOpen, setIsFilterOpen] = useState(false);            // 필터 onoff
-  const [myPos, setMyPos] = useState<[number, number] | null>(null);  // 현재위치, 원하는 위치
+  const [currentFilter, setCurrentFilter] = useState<Filters>({
+      lat: 35.1795,
+      lon: 129.0756,
+      radius: 3000,
+      canUse: false,
+      parkingFree: false,
+      limitYn: false,
+      chargerTypes: [],
+      chargerComps: [],
+      outputMin: 0,
+      outputMax: 300, 
+  }); 
+  const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);
   
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
-  const [places, setPlaces] = useState<Place[]>([]);                  // 검색어에따른 리스트
+  const [places, setPlaces] = useState<Place[]>([]);                  // 검색어에 따른 리스트
   const[kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
+
+
+  // 충전소 정보를 가져오는 통합 함수
+  // useCallback을 사용하여 myPos나 currentFilter가 변경될 때만 함수가 재생성되도록 함
+  const fetchStations = useCallback(async (filtersToApply: Filters) => {
+    // API 요청 DTO에 맞게 필터 객체 구성
+    const requestBody: ChargingStationRequestDto = {
+      "coorDinatesDto" : {
+        lat: filtersToApply.lat,
+        lon: filtersToApply.lon,
+        radius: filtersToApply.radius,
+      },
+      "mapQueryDto":{
+        useMap: true,
+        canUse: filtersToApply.canUse,
+        parkingFree: filtersToApply.parkingFree,
+        limitYn: filtersToApply.limitYn,
+        chgerType: filtersToApply.chargerTypes.length > 0 ? filtersToApply.chargerTypes : [], // 빈 배열일 때 undefined로 보내는 등 백엔드에 맞게 조정
+        busiId: filtersToApply.chargerComps.length > 0 ? filtersToApply.chargerComps : [],
+        outputMin: filtersToApply.outputMin,
+        outputMax: filtersToApply.outputMin,
+      }
+    };
+
+    console.log("API 요청 보낼 필터:", requestBody);
+
+    try {
+      const res = await axios.post<ChargingStationResponseDto[]>(
+        `http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`,
+        filtersToApply
+      );
+      const data = res.data;
+
+      setList(Array.isArray(data) ? data : []);
+      console.log("충전소 정보:: ", data);
+    } catch (err) {
+      console.error("fetchStations error: ", err);
+      setList([]);
+    }
+  }, []); // 의존성 배열 비워둠 (컴포넌트 마운트 시 한 번만 생성)
+
 
   // 1. 현재위치 가져오기
   useEffect(()=>{
       navigator.geolocation.getCurrentPosition((position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          setMyPos([lat, lng]);
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        // 초기 currentFilter에 위치 정보 업데이트
+        setCurrentFilter((prev) => ({
+          ...prev,
+          lat,  // 변수이름 같으면 생략가능
+          lon: lng,
+          
+        }));
+        setMyPos([lat, lng]);
       },
       (error) => {
           console.error("위치 정보를 가져오지 못했습니다.", error);
-          // 위치 못가져오면 기본값 서울시청
-          setMyPos([37.5665, 126.9780]);
+          // 위치 못가져오면 기본값 부산시청
+          setCurrentFilter((prev) => ({
+          ...prev,
+          lat: 35.1795,  
+          lon: 129.0756,
+        }));
+        setMyPos([35.1795, 129.0756]);
       });
   },[]);
 
@@ -62,29 +140,32 @@ export default function Home() {
     }
   },[])
 
-  // 3. 충전소정보 resp
+  // 3. currentFilter 변경 시 충전소 정보 다시 불러오기
   useEffect(()=>{
-    if (!myPos) return;
-
-    const stationInfo = async()=>{
-      try{
-        const res = await axios.post<ChargingStationResponseDto[]>(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`, 
-          {
-            "lat": myPos[0],
-            "lon": myPos[1]
-          }
-        );
-        const data = res.data;
-
-        setList(Array.isArray(data) ? data : []);
-        console.log("충전소정보:: ", data); 
-      } catch(err){
-        console.error("stationInfo error: ", err);
-        setList([]);
-      }
+    if (kakaoMapLoaded && currentFilter.lat && currentFilter.lon) {
+        fetchStations(currentFilter);
     }
-    stationInfo();
-  },[myPos])
+    // if (currentFilter.coorDinatesDto.lat == 0 && currentFilter.coorDinatesDto.lon == 0) return;
+
+    // const stationInfo = async()=>{
+    //   try{
+    //     const res = await axios.post<ChargingStationResponseDto[]>(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`, 
+    //       {
+    //         currentFilter
+    //       }
+    //     );
+    //     const data = res.data;
+
+    //     setList(Array.isArray(data) ? data : []);
+    //     console.log("충전소정보:: ", data); 
+    //     setMyPos([currentFilter.coorDinatesDto.lat, currentFilter.coorDinatesDto.lon]); //map에 보낼 경도,위도
+    //   } catch(err){
+    //     console.error("stationInfo error: ", err);
+    //     setList([]);
+    //   }
+    // }
+    // stationInfo();
+  },[currentFilter, kakaoMapLoaded, fetchStations])
 
   // 받은 list markers에 넣기
   const markers = list.map((item) => ({
@@ -129,9 +210,25 @@ export default function Home() {
     // 선택된 장소 경도, 위도 추출
     const lat = parseFloat(place.y); // 위도
     const lng = parseFloat(place.x); // 경도
+    setCurrentFilter((prev) => ({
+      ...prev,
+      lat,  
+      lon: lng,
+    }));
     setMyPos([lat, lng]);
-    setPlaces([]);
+    setPlaces([]);  // 검색 결과 목록 숨김
   }
+
+  // 5. 필터 선택했을 시
+  const handleApplyFilters = (newFilters: Omit<ChargingStationRequestDto, 'lat' | 'lon' >) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
+    setIsFilterOpen(false); //모달닫기
+    // 넘어온 정보들만 필터 씌우기
+    setCurrentFilter((prev) => ({
+      ...prev,
+      newFilters
+    }));
+  }
+
 
   return (
     // grid grid-rows-[20px_1fr_20px] p-8 pb-20 gap-16 sm:p-20/
@@ -144,7 +241,10 @@ export default function Home() {
             <h3 className=" font-semibold mb-4" style={{color:"#4FA969"}}> 충전소 찾기</h3>
             <button onClick={()=>setIsFilterOpen(true)}
               className='text-[24px] cursor-pointer' style={{color:'#666'}}><HiOutlineAdjustmentsHorizontal/></button>
-              <FilterModal isOpen={isFilterOpen} onClose={()=>setIsFilterOpen(false)} />
+              <FilterModal isOpen={isFilterOpen} 
+                          onClose={()=>setIsFilterOpen(false)}
+                          onApplyFilters={handleApplyFilters} // 필터
+                          initialFilters={currentFilter} />
           </div>
           {/* 검색 */}
           <input type="text" ref={searchRef} placeholder="장소를 검색하세요" className="w-full p-2 border rounded mb-4"/>

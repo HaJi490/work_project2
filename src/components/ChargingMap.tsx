@@ -84,7 +84,7 @@ export default function ChargingMap({markers, myPos} : ChargingMapProps) {
                             padding: 2px 6px;
                             border-radius: 12px;
                         ">
-                           ${mark.availableCnt}
+                            ${mark.availableCnt}
                         </div>
                         `;
                     const customOverlay = new window.kakao.maps.CustomOverlay({

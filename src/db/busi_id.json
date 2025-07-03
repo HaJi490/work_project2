@@ -1,0 +1,718 @@
+[
+ {
+  "busi_id": "AC",
+  "busi_nm": "아우토크립트"
+ },
+ {
+  "busi_id": "AH",
+  "busi_nm": "아하"
+ },
+ {
+  "busi_id": "AL",
+  "busi_nm": "아론"
+ },
+ {
+  "busi_id": "AM",
+  "busi_nm": "아마노코리아"
+ },
+ {
+  "busi_id": "AP",
+  "busi_nm": "애플망고"
+ },
+ {
+  "busi_id": "BA",
+  "busi_nm": "부안군"
+ },
+ {
+  "busi_id": "BE",
+  "busi_nm": "브라이트에너지파트너스"
+ },
+ {
+  "busi_id": "BG",
+  "busi_nm": "비긴스"
+ },
+ {
+  "busi_id": "BK",
+  "busi_nm": "비케이에너지"
+ },
+ {
+  "busi_id": "BN",
+  "busi_nm": "블루네트웍스"
+ },
+ {
+  "busi_id": "BP",
+  "busi_nm": "차밥스"
+ },
+ {
+  "busi_id": "BS",
+  "busi_nm": "보스시큐리티"
+ },
+ {
+  "busi_id": "BT",
+  "busi_nm": "보타리에너지"
+ },
+ {
+  "busi_id": "CA",
+  "busi_nm": "씨에스테크놀로지"
+ },
+ {
+  "busi_id": "CB",
+  "busi_nm": "참빛이브이씨"
+ },
+ {
+  "busi_id": "CC",
+  "busi_nm": "코콤"
+ },
+ {
+  "busi_id": "CG",
+  "busi_nm": "서울씨엔지"
+ },
+ {
+  "busi_id": "CH",
+  "busi_nm": "채움모빌리티"
+ },
+ {
+  "busi_id": "CI",
+  "busi_nm": "쿨사인"
+ },
+ {
+  "busi_id": "CN",
+  "busi_nm": "에바씨엔피"
+ },
+ {
+  "busi_id": "CO",
+  "busi_nm": "한전케이디엔"
+ },
+ {
+  "busi_id": "CP",
+  "busi_nm": "캐스트프로"
+ },
+ {
+  "busi_id": "CR",
+  "busi_nm": "크로커스"
+ },
+ {
+  "busi_id": "CS",
+  "busi_nm": "한국EV충전서비스센터"
+ },
+ {
+  "busi_id": "CT",
+  "busi_nm": "씨티카"
+ },
+ {
+  "busi_id": "CU",
+  "busi_nm": "씨어스"
+ },
+ {
+  "busi_id": "CV",
+  "busi_nm": "채비"
+ },
+ {
+  "busi_id": "DE",
+  "busi_nm": "대구공공시설관리공단"
+ },
+ {
+  "busi_id": "DG",
+  "busi_nm": "대구시"
+ },
+ {
+  "busi_id": "DL",
+  "busi_nm": "딜라이브"
+ },
+ {
+  "busi_id": "DO",
+  "busi_nm": "대한송유관공사"
+ },
+ {
+  "busi_id": "DP",
+  "busi_nm": "대유플러스"
+ },
+ {
+  "busi_id": "DR",
+  "busi_nm": "두루스코이브이"
+ },
+ {
+  "busi_id": "DS",
+  "busi_nm": "대선"
+ },
+ {
+  "busi_id": "DY",
+  "busi_nm": "동양이엔피"
+ },
+ {
+  "busi_id": "E0",
+  "busi_nm": "에너지플러스"
+ },
+ {
+  "busi_id": "EA",
+  "busi_nm": "에바"
+ },
+ {
+  "busi_id": "EB",
+  "busi_nm": "일렉트리"
+ },
+ {
+  "busi_id": "EC",
+  "busi_nm": "이지차저"
+ },
+ {
+  "busi_id": "EE",
+  "busi_nm": "이마트"
+ },
+ {
+  "busi_id": "EG",
+  "busi_nm": "에너지파트너즈"
+ },
+ {
+  "busi_id": "EH",
+  "busi_nm": "이앤에이치에너지"
+ },
+ {
+  "busi_id": "EK",
+  "busi_nm": "이노케이텍"
+ },
+ {
+  "busi_id": "EL",
+  "busi_nm": "엔라이튼"
+ },
+ {
+  "busi_id": "EM",
+  "busi_nm": "evmost"
+ },
+ {
+  "busi_id": "EN",
+  "busi_nm": "이엔"
+ },
+ {
+  "busi_id": "EO",
+  "busi_nm": "E1"
+ },
+ {
+  "busi_id": "EP",
+  "busi_nm": "이카플러그"
+ },
+ {
+  "busi_id": "ER",
+  "busi_nm": "이엘일렉트릭"
+ },
+ {
+  "busi_id": "ES",
+  "busi_nm": "이테스"
+ },
+ {
+  "busi_id": "ET",
+  "busi_nm": "이씨티"
+ },
+ {
+  "busi_id": "EV",
+  "busi_nm": "에버온"
+ },
+ {
+  "busi_id": "EZ",
+  "busi_nm": "차지인"
+ },
+ {
+  "busi_id": "FE",
+  "busi_nm": "에프이씨"
+ },
+ {
+  "busi_id": "FT",
+  "busi_nm": "포티투닷"
+ },
+ {
+  "busi_id": "G1",
+  "busi_nm": "광주시"
+ },
+ {
+  "busi_id": "G2",
+  "busi_nm": "광주시"
+ },
+ {
+  "busi_id": "GD",
+  "busi_nm": "그린도트"
+ },
+ {
+  "busi_id": "GE",
+  "busi_nm": "그린전력"
+ },
+ {
+  "busi_id": "GG",
+  "busi_nm": "강진군"
+ },
+ {
+  "busi_id": "GN",
+  "busi_nm": "지에스커넥트"
+ },
+ {
+  "busi_id": "GO",
+  "busi_nm": "유한회사 골드에너지"
+ },
+ {
+  "busi_id": "GP",
+  "busi_nm": "군포시"
+ },
+ {
+  "busi_id": "GR",
+  "busi_nm": "그리드위즈"
+ },
+ {
+  "busi_id": "GS",
+  "busi_nm": "GS칼텍스"
+ },
+ {
+  "busi_id": "HB",
+  "busi_nm": "에이치엘비생명과학"
+ },
+ {
+  "busi_id": "HD",
+  "busi_nm": "현대자동차"
+ },
+ {
+  "busi_id": "HE",
+  "busi_nm": "한국전기차충전서비스"
+ },
+ {
+  "busi_id": "HL",
+  "busi_nm": "에이치엘비일렉"
+ },
+ {
+  "busi_id": "HM",
+  "busi_nm": "휴맥스이브이"
+ },
+ {
+  "busi_id": "HP",
+  "busi_nm": "해피차지"
+ },
+ {
+  "busi_id": "HR",
+  "busi_nm": "한국홈충전"
+ },
+ {
+  "busi_id": "HS",
+  "busi_nm": "홈앤서비스"
+ },
+ {
+  "busi_id": "HW",
+  "busi_nm": "한화솔루션"
+ },
+ {
+  "busi_id": "HY",
+  "busi_nm": "현대엔지니어링"
+ },
+ {
+  "busi_id": "IC",
+  "busi_nm": "인천국제공항공사"
+ },
+ {
+  "busi_id": "IK",
+  "busi_nm": "익산시"
+ },
+ {
+  "busi_id": "IM",
+  "busi_nm": "아이마켓코리아"
+ },
+ {
+  "busi_id": "IN",
+  "busi_nm": "신세계아이앤씨"
+ },
+ {
+  "busi_id": "IO",
+  "busi_nm": "아이온커뮤니케이션즈"
+ },
+ {
+  "busi_id": "IV",
+  "busi_nm": "인큐버스"
+ },
+ {
+  "busi_id": "JA",
+  "busi_nm": "이브이시스"
+ },
+ {
+  "busi_id": "JC",
+  "busi_nm": "제주에너지공사"
+ },
+ {
+  "busi_id": "JD",
+  "busi_nm": "제주도청"
+ },
+ {
+  "busi_id": "JE",
+  "busi_nm": "제주전기자동차서비스"
+ },
+ {
+  "busi_id": "JH",
+  "busi_nm": "종하아이앤씨"
+ },
+ {
+  "busi_id": "JJ",
+  "busi_nm": "전주시"
+ },
+ {
+  "busi_id": "JN",
+  "busi_nm": "제이앤씨플랜"
+ },
+ {
+  "busi_id": "JT",
+  "busi_nm": "제주테크노파크"
+ },
+ {
+  "busi_id": "JU",
+  "busi_nm": "정읍시"
+ },
+ {
+  "busi_id": "KA",
+  "busi_nm": "기아자동차"
+ },
+ {
+  "busi_id": "KC",
+  "busi_nm": "한국컴퓨터"
+ },
+ {
+  "busi_id": "KE",
+  "busi_nm": "한국전기차인프라기술"
+ },
+ {
+  "busi_id": "KG",
+  "busi_nm": "KH에너지"
+ },
+ {
+  "busi_id": "KH",
+  "busi_nm": "김해시"
+ },
+ {
+  "busi_id": "KI",
+  "busi_nm": "기아자동차"
+ },
+ {
+  "busi_id": "KJ",
+  "busi_nm": "순천시"
+ },
+ {
+  "busi_id": "KL",
+  "busi_nm": "클린일렉스"
+ },
+ {
+  "busi_id": "KM",
+  "busi_nm": "카카오모빌리티"
+ },
+ {
+  "busi_id": "KN",
+  "busi_nm": "한국환경공단"
+ },
+ {
+  "busi_id": "KO",
+  "busi_nm": "이브이파트너스"
+ },
+ {
+  "busi_id": "KP",
+  "busi_nm": "한국전력"
+ },
+ {
+  "busi_id": "KR",
+  "busi_nm": "이브이씨코리아"
+ },
+ {
+  "busi_id": "KS",
+  "busi_nm": "한국전기차솔루션"
+ },
+ {
+  "busi_id": "KT",
+  "busi_nm": "케이티"
+ },
+ {
+  "busi_id": "KU",
+  "busi_nm": "한국충전연합"
+ },
+ {
+  "busi_id": "L3",
+  "busi_nm": "엘쓰리일렉트릭파워"
+ },
+ {
+  "busi_id": "LC",
+  "busi_nm": "롯데건설"
+ },
+ {
+  "busi_id": "LD",
+  "busi_nm": "롯데이노베이트"
+ },
+ {
+  "busi_id": "LH",
+  "busi_nm": "LG유플러스 볼트업(플러그인)"
+ },
+ {
+  "busi_id": "LI",
+  "busi_nm": "엘에스이링크"
+ },
+ {
+  "busi_id": "LT",
+  "busi_nm": "광성계측기"
+ },
+ {
+  "busi_id": "LU",
+  "busi_nm": "LG유플러스 볼트업"
+ },
+ {
+  "busi_id": "MA",
+  "busi_nm": "맥플러스"
+ },
+ {
+  "busi_id": "ME",
+  "busi_nm": "환경부"
+ },
+ {
+  "busi_id": "MO",
+  "busi_nm": "매니지온"
+ },
+ {
+  "busi_id": "MR",
+  "busi_nm": "미래씨앤엘"
+ },
+ {
+  "busi_id": "MS",
+  "busi_nm": "미래에스디"
+ },
+ {
+  "busi_id": "MT",
+  "busi_nm": "모던텍"
+ },
+ {
+  "busi_id": "MV",
+  "busi_nm": "메가볼트"
+ },
+ {
+  "busi_id": "NB",
+  "busi_nm": "엔비플러스"
+ },
+ {
+  "busi_id": "NE",
+  "busi_nm": "에너넷"
+ },
+ {
+  "busi_id": "NH",
+  "busi_nm": "농협경제지주 신재생에너지센터"
+ },
+ {
+  "busi_id": "NJ",
+  "busi_nm": "나주시"
+ },
+ {
+  "busi_id": "NN",
+  "busi_nm": "이브이네스트"
+ },
+ {
+  "busi_id": "NS",
+  "busi_nm": "뉴텍솔루션"
+ },
+ {
+  "busi_id": "NT",
+  "busi_nm": "한국전자금융"
+ },
+ {
+  "busi_id": "NX",
+  "busi_nm": "넥씽"
+ },
+ {
+  "busi_id": "OB",
+  "busi_nm": "현대오일뱅크"
+ },
+ {
+  "busi_id": "PA",
+  "busi_nm": "이브이페이"
+ },
+ {
+  "busi_id": "PC",
+  "busi_nm": "파킹클라우드"
+ },
+ {
+  "busi_id": "PE",
+  "busi_nm": "피앤이시스템즈"
+ },
+ {
+  "busi_id": "PI",
+  "busi_nm": "GS차지비"
+ },
+ {
+  "busi_id": "PK",
+  "busi_nm": "펌프킨"
+ },
+ {
+  "busi_id": "PL",
+  "busi_nm": "플러그링크"
+ },
+ {
+  "busi_id": "PM",
+  "busi_nm": "피라인모터스"
+ },
+ {
+  "busi_id": "PS",
+  "busi_nm": "이브이파킹서비스"
+ },
+ {
+  "busi_id": "PW",
+  "busi_nm": "파워큐브"
+ },
+ {
+  "busi_id": "RE",
+  "busi_nm": "레드이엔지"
+ },
+ {
+  "busi_id": "RS",
+  "busi_nm": "리셀파워"
+ },
+ {
+  "busi_id": "S1",
+  "busi_nm": "에스이피"
+ },
+ {
+  "busi_id": "SA",
+  "busi_nm": "설악에너텍"
+ },
+ {
+  "busi_id": "SB",
+  "busi_nm": "소프트베리"
+ },
+ {
+  "busi_id": "SC",
+  "busi_nm": "삼척시"
+ },
+ {
+  "busi_id": "SD",
+  "busi_nm": "스칼라데이터"
+ },
+ {
+  "busi_id": "SE",
+  "busi_nm": "서울시"
+ },
+ {
+  "busi_id": "SF",
+  "busi_nm": "스타코프"
+ },
+ {
+  "busi_id": "SG",
+  "busi_nm": "SK시그넷"
+ },
+ {
+  "busi_id": "SH",
+  "busi_nm": "에스에이치에너지"
+ },
+ {
+  "busi_id": "SJ",
+  "busi_nm": "세종시"
+ },
+ {
+  "busi_id": "SK",
+  "busi_nm": "SK에너지"
+ },
+ {
+  "busi_id": "SL",
+  "busi_nm": "에스에스기전"
+ },
+ {
+  "busi_id": "SM",
+  "busi_nm": "성민기업"
+ },
+ {
+  "busi_id": "SN",
+  "busi_nm": "서울에너지공사"
+ },
+ {
+  "busi_id": "SO",
+  "busi_nm": "선광시스템"
+ },
+ {
+  "busi_id": "SP",
+  "busi_nm": "스마트포트테크놀로지"
+ },
+ {
+  "busi_id": "SR",
+  "busi_nm": "SK렌터카"
+ },
+ {
+  "busi_id": "SS",
+  "busi_nm": "투이스이브이씨"
+ },
+ {
+  "busi_id": "ST",
+  "busi_nm": "SK일렉링크"
+ },
+ {
+  "busi_id": "SU",
+  "busi_nm": "순천시 체육시설관리소"
+ },
+ {
+  "busi_id": "SZ",
+  "busi_nm": "SG생활안전"
+ },
+ {
+  "busi_id": "TB",
+  "busi_nm": "태백시"
+ },
+ {
+  "busi_id": "TD",
+  "busi_nm": "타디스테크놀로지"
+ },
+ {
+  "busi_id": "TE",
+  "busi_nm": "테슬라"
+ },
+ {
+  "busi_id": "TH",
+  "busi_nm": "태현교통"
+ },
+ {
+  "busi_id": "TL",
+  "busi_nm": "티엘컴퍼니"
+ },
+ {
+  "busi_id": "TM",
+  "busi_nm": "티맵"
+ },
+ {
+  "busi_id": "TR",
+  "busi_nm": "한마음장애인복지회"
+ },
+ {
+  "busi_id": "TS",
+  "busi_nm": "태성콘텍"
+ },
+ {
+  "busi_id": "TU",
+  "busi_nm": "티비유"
+ },
+ {
+  "busi_id": "TV",
+  "busi_nm": "아이토브"
+ },
+ {
+  "busi_id": "UN",
+  "busi_nm": "유니이브이"
+ },
+ {
+  "busi_id": "UP",
+  "busi_nm": "유플러스아이티"
+ },
+ {
+  "busi_id": "US",
+  "busi_nm": "울산시"
+ },
+ {
+  "busi_id": "VT",
+  "busi_nm": "볼타"
+ },
+ {
+  "busi_id": "WB",
+  "busi_nm": "이브이루씨"
+ },
+ {
+  "busi_id": "YC",
+  "busi_nm": "노란충전"
+ },
+ {
+  "busi_id": "YY",
+  "busi_nm": "양양군"
+ },
+ {
+  "busi_id": "ZE",
+  "busi_nm": "이브이모드코리아"
+ }
+]

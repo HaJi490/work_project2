@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import style from './SpeedSlider.module.css'
+import style from './Slider.module.css'
 
+interface sliderProps{
+  setMinMax: (min: number, max: number) => void; 
+}
 const max = 300
 const min = 0
 
-export default function SpeedSlider() {
+export default function Slider({setMinMax}: sliderProps) {
   const [minValue, setMinValue] = useState<number>(min);
   const [maxValue, setMaxValue] = useState<number>(max);
 
@@ -23,11 +26,13 @@ export default function SpeedSlider() {
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(Number(e.target.value), maxValue - 50); //최소간격 확보
     setMinValue(value);
+    setMinMax(minValue, maxValue);
   }
   
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.max(Number(e.target.value), minValue + 50); //최소간격 확보
     setMaxValue(value);
+    setMinMax(minValue, maxValue);
   }
 
   // // 2. 핸들 위치 업데이트 -------------------------FIXME 슬라이더 핸들위에 수치가 뜰수있게
