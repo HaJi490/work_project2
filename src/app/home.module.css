@@ -8,9 +8,21 @@
     /* nav 높이 빼기 */
 }
 
+.searchInput{
+    width: 100%; 
+    padding: 10px 5px 10px 15px ;
+    margin-bottom: 7;
+    background: rgba(79, 169, 105, 0.1);
+    border-radius: 999px;  
+}
+
+.searchInput::placeholder {
+    color: #f2f2f2;
+}
+
 .listSection{
-    border-bottom: 1px solid #232323;
-    padding: 0 2 0 2;
+    border-bottom: 1px solid #f2f2f2;
+    padding: 10 0 10 0;
     cursor: pointer;
     
 }

@@ -55,13 +55,12 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         {value: '운영기관'},
     ]
 
-    // // 충전속도
-    // const chargingSpeed: {value: string}[] = [
-    //     {value: "완속"},
-    //     {value: "중속"},
-    //     {value: "급속"},
-    //     {value: "급속+"},
-    // ]
+    // 탐색반경
+    const range: {value: number}[]=[
+        {value: 2000}, {value: 3000},
+        {value: 5000}, {value: 10000},
+        {value: 30000}, {value: 0} //전국
+    ]
 
     // 충전사
     const chargingComp: {value: string}[] = [
@@ -72,9 +71,8 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         {value: "GS차지비"}, {value: "차지인"},
         {value: "클린일렉스"}, {value: "타디스테크놀로지"},
         {value: "파워큐브"}, {value: "플러그링크"},
-        {value: "한국전력"}, {value: "차지인"},
-        {value: "GS차지비"}, {value: "차지인"},
-        {value: "기타"}
+        {value: "한국전력"}, {value: "환경부"},
+        {value: "휴맥스이브이"}, {value: "기타"}
     ]
 
     // 커넥터 타입
@@ -121,8 +119,8 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     }
 
     // 범위 슬라이더 핸들러
-    const handleRange = (range: number) =>{
-        setSelectedRange(range);
+    const handleRange = (value: number) =>{
+        setSelectedRange(value);
     }
 
     // 충전속도 슬라이더 핸들러
@@ -161,12 +159,13 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
             chargerComps: selectedChargerComps,
         }; 
         onApplyFilters(filters);
+        onClose();
     }
 
     if(!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className={style.modalBackdrop}>
         {/* 모달본체 */}
         <div className="bg-white rounded w-full max-w-xl p-6 relative flex flex-col h-[80vh]">
             {/* 헤더 */}
@@ -184,7 +183,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
             </div>
             
             {/* 스크롤 가능한 영역 */}
-            <div className={style.scrollContent}>
+            <div className="scrollContent">
                 {/* 속성설정 */}
                 <div ref={propSectionRef} className="mb-8">  
                     <h4 className="mb-2" style={{color:'#666'}}>속성</h4>
@@ -200,8 +199,14 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                 {/* 탐색반경 설정 */}
                 <div ref={rangeSectionRef} className="mb-8">
                     <h4 className="mb-2" style={{color:'#666'}}>탐색반경</h4>
-                    <div className="mb-4">
-                        <Slider setRange={handleRange}/>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {range.map((item) => (
+                            <button key={item.value} className={`${style.propYn} ${selectedRange === item.value ? style.active : ''}`}
+                                    onClick={(e)=>handleRange(item.value)}>
+                                {item.value === 0 ? '전국' : `${item.value / 1000}km`}
+                            </button>
+                        ))}
+                        {/* <Slider setRange={handleRange}/> */}
                     </div>
                 </div>
                 {/* 충전속도 설정 */}
@@ -218,7 +223,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                             </button>
                         ))}
                     </div> */}
-                </div>
+                </div> 
                 {/* 커넥터 설정 */}
                 <div ref={connectorSectionRef} className="mb-8">
                     <h4 className="mb-2" style={{color:'#666'}}>커넥터</h4>
@@ -249,7 +254,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                 </div>
             </div> 
             <div className="pt-4 border-t sticky bottom-0 bg-white z-10" style={{borderColor:'#f2f2f2'}}> {/* mt-auto와 sticky, z-10 추가 */}
-                <button className="w-full bg-[#4FA969] text-white rounded py-3 mt-3">n개의 결과보기</button>
+                <button className="w-full bg-[#4FA969] text-white rounded py-3 mt-3" onClick={()=>handleResultButton()}>n개의 결과보기</button>
             </div>
         </div>
     </div>
