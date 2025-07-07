@@ -11,6 +11,8 @@ import { FiEdit } from "react-icons/fi";
 import { BiSolidCar } from "react-icons/bi";
 import { LiaCarSideSolid } from "react-icons/lia";
 import { FiCheckCircle } from "react-icons/fi";
+import { AiOutlineExclamationCircle } from "react-icons/ai";
+import { HiOutlineCheckCircle } from "react-icons/hi2";
 
 declare global {
   interface Window {
@@ -32,6 +34,7 @@ export default function signup() {
     const [pwd, setPwd] = useState<string>('');
     const [isPwdValid, setIsPwdValid] = useState<boolean | null>(null);
     const [showPwdCondition, setShowPwdCondition] = useState<boolean>(false);   // 메시지 표시여부
+    
     const [pwdConfirm, setPwdConfirm] = useState<string>('');
     const [pwdConfirmMsg, setPwdConfirmMsg] = useState<string | null>(null);
     const [isPwdConfirmValid, setIsPwdConfirmValid] = useState<boolean | null>(null);
@@ -83,31 +86,32 @@ export default function signup() {
     const numberCheck = /[0-9]/.test(ePwd);
     const specialCheck = /[!@#$%^&*(),.?":{}|<>_\-\\[\]\/~`+=;]/.test(ePwd);
     
-    if (pwd.length === 0) {
+    setPwd(ePwd);
+
+    if (ePwd.length === 0) {
         setIsPwdValid(null); // 입력값이 없으면 상태를 초기화
         return null;
     }
 
     if (!lengthCheck) {
         setIsPwdValid(false);
-        return `비밀번호는 ${MIN_PW_LENGTH}자 이상이어야 합니다.`;
+        // return `비밀번호는 ${MIN_PW_LENGTH}자 이상이어야 합니다.`;
     }
     if (!lowerCheck) {
         setIsPwdValid(false);
-        return '비밀번호는 소문자를 포함해야 합니다.';
+        // return '비밀번호는 소문자를 포함해야 합니다.';
     }
     if (!numberCheck) {
         setIsPwdValid(false);
-        return '비밀번호는 숫자를 포함해야 합니다.';
+        // return '비밀번호는 숫자를 포함해야 합니다.';
     }
     if (!specialCheck) {
         setIsPwdValid(false);
-        return '비밀번호는 특수문자를 포함해야 합니다.';
+        // return '비밀번호는 특수문자를 포함해야 합니다.';
     }
 
     setIsPwdValid(true);
-    setPwd(ePwd);
-    return '사용 가능한 비밀번호입니다.';
+    // return '사용 가능한 비밀번호입니다.';
     
     // return lengthCheck && upperCheck && lowerCheck && numberCheck && specialCheck
     }
@@ -130,13 +134,15 @@ export default function signup() {
     };
 
     // 폰 형식
-    const formatPhoneNumber = (value: any) => {
+    const formatPhoneNumber = (value: string) => {
         const digits = value.replace(/\D/g, '');
-        if (digits.length === 11)
-        return digits.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-        else if (digits.length === 10)
-        return digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-        return value;
+        let formatted = digits;
+
+        if (digits.length > 7)
+            formatted = digits.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        else if (digits.length > 3 && digits.length <= 7)
+            formatted = digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        return formatted;
     };
 
     // 이메일 선택
@@ -156,20 +162,70 @@ export default function signup() {
         oncomplete: function (data: any) {
             setZoneCode(data.zonecode); // 우편번호
             setRoadAddress(data.roadAddress); // 도로명 주소
+            setAddr('');    //상세주소 초기화
         },
     }).open();
     };
 
     // 회원정보 등록
     const submitMember = async() => {
+        // 필수 필드 유효성 검사
+        let isValidForm = true;
+        let errorMessage = '';
+
+        // 이름 검사
+        if (username.length < MIN_NAME_LENGTH) {
+            isValidForm = false;
+            errorMessage += `이름은 ${MIN_NAME_LENGTH}자 이상이어야 합니다.\n`;
+        }
+
+        // 아이디 검사
+        if (!id || !isIdValid) { // isIdValid가 false거나 null인 경우 포함
+            isValidForm = false;
+            errorMessage += '아이디를 올바르게 입력하고 중복 확인을 해주세요.\n';
+        }
+
+        // 비밀번호 검사
+        if (!pwd || !isPwdValid) { // isPwdValid가 false거나 null인 경우 포함
+            isValidForm = false;
+            errorMessage += '비밀번호를 올바른 형식으로 입력해주세요.\n';
+        }
+
+        // 비밀번호 확인 검사
+        if (!pwdConfirm || !isPwdConfirmValid) { // isPwdConfirmValid가 false거나 null인 경우 포함
+            isValidForm = false;
+            errorMessage += '비밀번호 확인이 일치하지 않습니다.\n';
+        }
+
+        // 전화번호 검사 (간단한 길이 확인)
+        if (phone.replace(/-/g, '').length < 10) { // 하이픈 제거 후 최소 10자리
+            isValidForm = false;
+            errorMessage += '유효한 휴대폰 번호를 입력해주세요.\n';
+        }
+
+        // 이메일 검사 (간단한 유효성)
+        if (!email || !customDomain || !email.includes('@') && customDomain === '직접입력') { // @ 포함 여부는 email 상태에 직접 확인, customDomain이 직접입력이 아닌 경우만 유효성 검사
+            // 이메일 주소의 기본 유효성 검사 (아주 기본적인 예시)
+            const fullEmail = `${email}@${customDomain}`;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(fullEmail)) {
+                isValidForm = false;
+                errorMessage += '유효한 이메일 주소를 입력해주세요.\n';
+            }
+        }
+
+        if (!isValidForm) {
+            alert(errorMessage);
+            return; // 유효성 검사 실패 시 함수 종료
+        }
         const requestBody: SignupRequest = {
             username: id,
             nickname: username,
             password: pwd,
-            phoneNumber: formatPhoneNumber(phone),
+            phoneNumber: phone,
             email: `${email}@${customDomain}`,
             sex: gender,
-            createAt: new Date(),
+            createAt: new Date().toISOString().slice(0, 19),
             ...(addr && {address: `${roadAddress} ${addr}`}),
         }
 
@@ -223,7 +279,7 @@ export default function signup() {
                     <div className="flex gap-2 items-start">
                         <div className="w-full max-w-[450px]">
                             <input type='text' value={id} onChange={(e) => setId(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`} />
-                            {validMsg && <p className={`text-[12px] mt-1 ${isIdValid? 'text-[#4FA969]' : 'text-[#D42D2D]'}`} >{validMsg}</p>}
+                            {validMsg && <p className={`flex text-[12px] mt-1 ${isIdValid? 'text-[#4FA969]' : 'text-[#D42D2D]'}`} ><span className="mt-[3px] ml-[2px]">{isIdValid? <HiOutlineCheckCircle /> : <AiOutlineExclamationCircle/>}</span>{validMsg}</p>}
                         </div>
                         <button type="button" onClick={()=>{checkValid()} }className="h-[50px] border border-[#afafaf] rounded text-[#666666] px-4 py-3 ml-4 cursor-pointer"> 중복확인</button>
                     </div> 
@@ -232,17 +288,25 @@ export default function signup() {
                     <label>비밀번호</label>
                     <div className="w-full max-w-[450px]">
                         <input type="password" value={pwd} onChange={(e) => isValidPassword(e.target.value.trim())} 
-                                onFocus={()=>setShowPwdCondition(true)} onBlur={(e) => {setShowPwdCondition(false)}}className={`${style.inputbox} max-w-[450px]`} />
-                        {showPwdCondition && <p className='text-[12px] mt-1'>비밀번호는 8자 이상, 소문자, 숫자, 특수문자 각각 하나 이상 포함해야합니다.</p>}
+                                onFocus={()=>setShowPwdCondition(true)} onBlur={(e) => {setShowPwdCondition(false)}} 
+                                className={`${style.inputbox} max-w-[450px] focus:outline-none ${isPwdValid === null ? '' : isPwdValid ? 'outline outline-[#4FA969]' : 'outline outline-[#D42D2D]'}`} /> 
+                                {/* 🍕ouline색상 적용안됨, 비밀번호 유효성 검사가 안됨 */}
+                        {showPwdCondition && <p className='text-[12px] mt-1'>※ 비밀번호는 8자 이상, 소문자, 숫자, 특수문자 각각 하나 이상 포함해야 합니다.</p>}
                     </div>
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                     <label>비밀번호 확인</label>
-                    <input type="password" value={pwdConfirm} onChange={(e) => setPwdConfirm(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`} />
+                    <div>
+                        <input type="password" value={pwdConfirm} onChange={(e) => {setPwdConfirm(e.target.value.trim()); checkPasswordConfirm(e.target.value.trim());}} 
+                                onBlur={() => setPwdConfirmMsg(null)} className={`${style.inputbox} max-w-[450px] `} /> 
+                                {/*🍕 {...isValid? '' : 'disabled readOnly'} 비밀번호 유효하지않으면 못쓰게 */}
+                        {pwdConfirmMsg && <p className={`text-[12px] mt-1 ${isPwdConfirmValid? 'text-[#4FA969]' : 'text-[#D42D2D]'}`} >{pwdConfirmMsg}</p>}
+                    </div>
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                     {/* 휴대폰번호 */}
                     <label>휴대폰 번호</label>
                     <div>
-                        <input type="text" placeholder='숫자만 입력해주세요' value={phone} onChange={(e) => setPhone(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`}/>
+                        <input type="text" placeholder='숫자만 입력해주세요' value={phone} className={`${style.inputbox} max-w-[450px]`}
+                                onChange={(e) => {const formatVal = formatPhoneNumber(e.target.value.trim()); setPhone(formatVal);}} maxLength={13} />
                         {/* &ensp;-&ensp;
                         <input type="text" className={`${style.inputbox} max-w-[150px]`}/>&ensp;-&ensp;
                         <input type="text" className={`${style.inputbox} max-w-[150px]`}/> */}
@@ -283,8 +347,8 @@ export default function signup() {
                             <input type="text" value={zoneCode} onChange={(e) => setZoneCode(e.target.value)} readOnly className={`${style.inputbox} max-w-[200px]`}/>
                             <button type="button" onClick={openDaumPostcode} className="border border-[#afafaf] text-[#666666] rounded px-4 py-3 ml-4 cursor-pointer">우편번호 검색</button>
                         </div>
-                        <input type="text" value={roadAddress} onChange={(e) => setZoneCode(e.target.value)} readOnly className={style.inputbox}/>
-                        <input type="text" placeholder="상세주소를 입력해주세요" className={style.inputbox}/>
+                        <input type="text" value={roadAddress} onChange={(e) => setRoadAddress(e.target.value)} readOnly className={style.inputbox}/>
+                        <input type="text" placeholder="상세주소를 입력해주세요" value={addr} onChange={(e) => setAddr(e.target.value.trim())} className={style.inputbox}/>
                     </div>
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                 </div>

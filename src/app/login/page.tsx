@@ -64,7 +64,7 @@ export default function page() {
           {/* </div> */}
         </form>
         <div className='text-[#666] text-[15px] flex gap-3'>
-            <span>회원가입</span>
+            <span onClick={()=>{route.push('/signup')}} className="cursor-pointer">회원가입</span>
             <span>비밀번호찾기</span>
         </div>
         <div className="flex justify-center my-4">
