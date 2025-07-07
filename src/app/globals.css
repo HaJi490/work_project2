@@ -14,6 +14,10 @@
      예: max-height: calc(100vh - 200px); */
 }
 
+.stateBadge{
+  
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -76,21 +76,19 @@ export interface ChargingStationResponseDto {
   busiNm: string;
   chargerInfo: ChargerInfoMap;
 }
-// // 충전소별
-// export interface ChargingStationResponseDto {
-//   statNm: string;          // 충전소 이름
-//   statId: string;          // 충전소 ID
-//   addr: string;            // 주소
-//   lat: number;            
-//   lng: number;            
-//   parkingFree: boolean;    // 주차 무료 여부
-//   limitYn: boolean;        // 이용 제한 여부
-//   totalChargeNum: number;  // 전체 충전기 수
-//   chargeNum: number;       // 사용 가능한 충전기 수
-//   enabledCharger: number | null; // (예비용 필드, 현재 null)
-//   busiId: string;          // 사업자 코드
-//   busiNm: string;          // 사업자 이름 (충전사)
-// }
+
+
+// 회원가입 reqest
+export interface SignupRequest {
+  username: string;
+  nickname: string;
+  password: string;
+  phoneNumber: string;
+  email: string;
+  sex: 'male' | 'female'| undefined;
+  address?: string; // 선택 입력이므로 optional로 처리
+  createAt: string | Date; // Date 객체일 수도 있고, ISO 문자열일 수도 있음
+}
 
 
 

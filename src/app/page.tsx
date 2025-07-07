@@ -88,19 +88,19 @@ export default function Home() {
 
     console.log("API 요청 보낼 필터:", requestBody);
 
-    try {
-      const res = await axios.post<ChargingStationResponseDto[]>(
-        `http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`,
-        requestBody
-      );
-      const data = res.data;
+    // try {
+    //   const res = await axios.post<ChargingStationResponseDto[]>(
+    //     `http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`,
+    //     requestBody
+    //   );
+    //   const data = res.data;
 
-      setList(Array.isArray(data) ? data : []);
-      console.log("충전소 정보:: ", data);
-    } catch (err) {
-      console.error("fetchStations error: ", err);
-      setList([]);
-    }
+    //   setList(Array.isArray(data) ? data : []);
+    //   console.log("충전소 정보:: ", data);
+    // } catch (err) {
+    //   console.error("fetchStations error: ", err);
+    //   setList([]);
+    // }
   }, []); 
 
 
@@ -157,7 +157,7 @@ export default function Home() {
   },[currentFilter, kakaoMapLoaded, fetchStations])
 
   // 받은 list markers에 넣기
-  const markers = list.map((item) => ({ // 🍕 respDummies 로 변경
+  const markers = respDummies.map((item) => ({ // 🍕 respDummies 로 변경
     id: item.statId,
     name: item.statNm,
     lat: item.lat,
@@ -208,7 +208,7 @@ export default function Home() {
     setPlaces([]);  // 검색 결과 목록 숨김
   }
 
-  // 6. 필터 선택했을 시
+  // 6. 필터 완료버튼 클릭했을 시
   const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
     setIsFilterOpen(false); //모달닫기
     // 넘어온 정보들만 필터 씌우기
@@ -278,13 +278,13 @@ export default function Home() {
           {/* 충전소 목록 */}
           {/* <h4>충전소 목록</h4> */}
           <ul className="scrollContent">
-            {list.map((item) => ( // 🍕 respDummies 로 변경
+            {respDummies.map((item) => ( // 🍕 respDummies 로 변경
               <li key={item.statId} className={style.listSection} onClick={()=>handleStaionClick(item)}>
                 <h4 className='text-[15px]' style={{color:'#232323'}}>{item.statNm}</h4>
                 <p className='text-[12px]' style={{color:'#666'}}>{item.addr}</p>
                 <div className='flex gap-3'>
                   <p className='text-[12px]' style={{color:'#666'}}>
-                    {item.parkingFree ? '무료주차, ' : '유료주차, '} {item.limitYn ? '개방, ': '비개방, '} {item.chargeNum} / { item.totalChargeNum}</p>
+                    {item.parkingFree ? '무료주차, ' : '유료주차, '} {item.limitYn ? '비개방, ': '개방, '} {item.chargeNum} / { item.totalChargeNum}</p>
                 </div>
               </li>
 

@@ -1,0 +1,12 @@
+[
+    { "code": "01", "type": "DC차데모" },
+    { "code": "02", "type": "AC완속" },
+    { "code": "03", "type": "DC차데모+AC3상" },
+    { "code": "04", "type": "DC콤보" },
+    { "code": "05", "type": "DC차데모+DC콤보" },
+    { "code": "06", "type": "DC차데모+AC3상+DC콤보" },
+    { "code": "07", "type": "AC3상" },
+    { "code": "08", "type": "DC콤보(완속)" },
+    { "code": "09", "type": "NACS" },
+    { "code": "10", "type": "DC콤보+NACS" }
+]

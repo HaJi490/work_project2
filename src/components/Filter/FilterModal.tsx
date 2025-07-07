@@ -20,8 +20,8 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     const [parkingFree, setParkingFree] = useState<boolean>(initialFilters.parkingFree);      // 무료주차
     const [limitYn, setLimitYn] = useState<boolean>(initialFilters.limitYn);              // 개방
     const [selectedRange, setSelectedRange] = useState<number>(initialFilters.radius);
-    const [selectedSpeedMin, setSelectedSpeedMin] = useState<number>();
-    const [selectedSpeedMax, setSelectedSpeedMax] = useState<number>();
+    const [selectedSpeedMin, setSelectedSpeedMin] = useState<number>(initialFilters.outputMin);
+    const [selectedSpeedMax, setSelectedSpeedMax] = useState<number>(initialFilters.outputMin);
     const [selectedChargerTypes, setSelectedChargerTypes] = useState<string[]>(initialFilters.chargerTypes); // 커넥터타입 선택상태
     const [selectedChargerComps, setSelectedChargerComps] = useState<string[]>(initialFilters.chargerComps); // 충전사 선택상태
     // slider의 min/max값
@@ -152,7 +152,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
             canUse,
             parkingFree,
             limitYn,
-            radius: selectedRange, // FIXME 슬라이더에서 max값 가져오기
+            radius: selectedRange,
             outputMin: selectedSpeedMin,
             outputMax: selectedSpeedMax,
             chargerTypes: selectedChargerTypes,
@@ -191,7 +191,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                         <button className={`${style.propYn} ${canUse ? style.active : ''}`} 
                                 onClick={() => handlePropToggle('canUse')}>충전가능</button>
                         <button className={`${style.propYn} ${limitYn ? style.active : ''}`} 
-                                onClick={() => handlePropToggle('limitYn')}>개방여부</button>
+                                onClick={() => handlePropToggle('limitYn')}>개방</button>
                         <button className={`${style.propYn} ${parkingFree ? style.active : ''}`} 
                                 onClick={() => handlePropToggle('parkingFree')}>무료주차</button>
                     </div>
@@ -213,16 +213,10 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                 <div ref={speedSectionRef} className="mb-8">
                     <h4 className="mb-2" style={{color:'#666'}}>충전속도</h4>
                     <div className="mb-4">
-                        <TwowaySlider setMinMax={handleChargingSpeed}/>
+                        <TwowaySlider min={selectedSpeedMin}
+                                        max= {selectedSpeedMax}
+                                        setMinMax={handleChargingSpeed}/>
                     </div>
-                    {/* <div className="flex flex-wrap gap-2 mb-4">
-                        {chargingSpeed.map((item) => (
-                            <button className={`${style.propYn} ${selectedSpeed.includes(item.value)? style.active: ''}`}
-                                    onClick={()=>handleChargingSpeed({target: {value: item.value, checked: !selectedSpeed.includes(item.value)}}as React.ChangeEvent<HTMLInputElement>)}>
-                                {item.value}
-                            </button>
-                        ))}
-                    </div> */}
                 </div> 
                 {/* 커넥터 설정 */}
                 <div ref={connectorSectionRef} className="mb-8">
