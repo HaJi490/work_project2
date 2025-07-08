@@ -27,6 +27,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     // slider의 min/max값
     
     const [activeTab, setActiveTab] = useState<string>('속성');                     // 탭메뉴 선택상태(기본값 '속성')
+    const [resultNum, setResultNum] = useState<number>();
 
     // 각 섹션 참조를 위한 useRef
     const propSectionRef = useRef<HTMLDivElement>(null);
@@ -146,6 +147,28 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         );
     }
 
+    // // 버튼에 결과 몇개인지
+    // useEffect(()=>{
+    //     const getResultNum = ()=>{
+    //         const requset = {
+    //             canUse,
+    //             parkingFree,
+    //             limitYn,
+    //             radius: selectedRange,
+    //             outputMin: selectedSpeedMin,
+    //             outputMax: selectedSpeedMax,
+    //             chargerTypes: selectedChargerTypes,
+    //             chargerComps: selectedChargerComps,
+    //         }; 
+    //         try{
+    //             // const res = await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080`, request);
+                
+    //             setResultNum(res.data);
+    //         }
+    //     }
+    // },[])
+    
+
     // '결과보기'버튼 클릭시 필터데이터를 부모로 전달
     const handleResultButton = () => {
         const filters = {
@@ -248,7 +271,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                 </div>
             </div> 
             <div className="pt-4 border-t sticky bottom-0 bg-white z-10" style={{borderColor:'#f2f2f2'}}> {/* mt-auto와 sticky, z-10 추가 */}
-                <button className="w-full bg-[#4FA969] text-white rounded py-3 mt-3" onClick={()=>handleResultButton()}>n개의 결과보기</button>
+                <button className="w-full bg-[#4FA969] text-white rounded py-3 mt-3" onClick={()=>handleResultButton()}>결과보기</button>
             </div>
         </div>
     </div>

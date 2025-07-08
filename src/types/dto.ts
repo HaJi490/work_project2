@@ -14,6 +14,7 @@ export interface MapQueryDto {
   outputMax: number;
   busiId: string[];     // 사업자 ID 리스트
   chgerType: string[];  // 충전기 타입 리스트
+  keyWord?: string;
 }
 
 export interface ChargingStationRequestDto {

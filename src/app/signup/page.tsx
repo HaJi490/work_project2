@@ -4,12 +4,12 @@ import React, { ReactElement, useState } from "react";
 import Nav from "@/components/Nav/Nav";
 import Script from "next/script";
 import axios, { AxiosError } from "axios";
+import { useRouter } from 'next/navigation';
 
 import {SignupRequest} from '../../types/dto'
 import style from './signup.module.css'
 import { FiEdit } from "react-icons/fi";
 import { BiSolidCar } from "react-icons/bi";
-import { LiaCarSideSolid } from "react-icons/lia";
 import { FiCheckCircle } from "react-icons/fi";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { HiOutlineCheckCircle } from "react-icons/hi2";
@@ -26,6 +26,8 @@ type StepItem = {
 }
 
 export default function signup() {
+    const route = useRouter();
+
     const [username, setUsername] = useState<string>('');
     const [id, setId] = useState<string>('');
     const [isIdValid, setIsIdValid] = useState<boolean | null >(null);
@@ -235,6 +237,8 @@ export default function signup() {
         } catch(error){
             console.error('submitMember: ', error);
         }
+
+        route.push('/evInfo');
     }
 
 
@@ -355,7 +359,7 @@ export default function signup() {
             </div>
             <div className="flex gap-5">
                 <button className={`${style.btn} ${style.cancel}`}>취소</button>
-                <button onClick={()=>{submitMember()}} className={`${style.btn} ${style.confirm}`}>가입</button>
+                <button onClick={()=>{submitMember()}} className={`${style.btn} ${style.confirm} cursor-pointer`}>다음</button>
             </div>
         </main>
     </div>

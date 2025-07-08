@@ -12,8 +12,9 @@ import style from './home.module.css';
 import ChargingMap from "../components/ChargingMap copy";
 import Nav from "../components/Nav/Nav";
 import FilterModal from "../components/Filter/FilterModal"
-import StationDetailPanal from "@/components/StationDetailPanal";
+import StationDetailPanal from "@/components/StationDetailPanal.module/StationDetailPanal";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
+import { TfiSearch } from "react-icons/tfi";
 
 interface Place {
   id: string;
@@ -34,14 +35,15 @@ interface Filters {
   chargerComps: string[];
   outputMin: number;
   outputMax: number;
+  keyWord?: string;
 }
 
 export default function Home() {
   const[list, setList] = useState<ChargingStationResponseDto[]>([]);  // resp
   const [isFilterOpen, setIsFilterOpen] = useState(false);            // 필터 onoff
   const [currentFilter, setCurrentFilter] = useState<Filters>({       // req에 담을 정보
-      lat: 35.1795,
-      lon: 129.0756,
+      lat: 35.2325,
+      lon: 129.0851,
       radius: 2000,
       canUse: false,
       parkingFree: false,
@@ -50,13 +52,15 @@ export default function Home() {
       chargerComps: [],
       outputMin: 0,
       outputMax: 300, 
+      keyWord: '',
   }); 
-  const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);     // map에 쓰일 현재위치
+  const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);         // map에 쓰일 현재위치_ 반경표시
+  const [mapCenter, setMapCenter] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]); // map의 중심
   const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null >(null); // 선택된 충전소
   
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
-  const [places, setPlaces] = useState<Place[]>([]);                  // 검색어에 따른 리스트
-  const[kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
+  // const [places, setPlaces] = useState<Place[]>([]);               // 검색어에 따른 리스트
+  const [kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
 
 
   // 1. 충전소 정보를 가져오는 통합 함수
@@ -83,24 +87,25 @@ export default function Home() {
         busiId: filtersToApply.chargerComps.length > 0 ? CompNmToIds(filtersToApply.chargerComps) : [],
         outputMin: filtersToApply.outputMin,
         outputMax: filtersToApply.outputMax,
+        keyWord: filtersToApply.keyWord
       }
     };
 
     console.log("API 요청 보낼 필터:", requestBody);
 
-    // try {
-    //   const res = await axios.post<ChargingStationResponseDto[]>(
-    //     `http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`,
-    //     requestBody
-    //   );
-    //   const data = res.data;
+    try {
+      const res = await axios.post<ChargingStationResponseDto[]>(
+        `http://${process.env.NEXT_PUBLIC_BACKIP}:8080/map/post/stations`,
+        requestBody
+      );
+      const data = res.data;
 
-    //   setList(Array.isArray(data) ? data : []);
-    //   console.log("충전소 정보:: ", data);
-    // } catch (err) {
-    //   console.error("fetchStations error: ", err);
-    //   setList([]);
-    // }
+      setList(Array.isArray(data) ? data : []);
+      console.log("충전소 정보:: ", data);
+    } catch (err) {
+      console.error("fetchStations error: ", err);
+      setList([]);
+    }
   }, []); 
 
 
@@ -117,16 +122,18 @@ export default function Home() {
           
         }));
         setMyPos([lat, lng]);
+        setMapCenter([lat, lng]);
       },
       (error) => {
           console.error("위치 정보를 가져오지 못했습니다.", error);
-          // 위치 못가져오면 기본값 부산시청
+          // 위치 못가져오면 기본값 부산대역
           setCurrentFilter((prev) => ({
           ...prev,
-          lat: 35.1795,  
-          lon: 129.0756,
+          lat: 35.2325,  
+          lon: 129.0851,
         }));
         setMyPos([35.1795, 129.0756]);
+        setMapCenter([35.1795, 129.0756]);
       });
   },[]);
 
@@ -157,7 +164,7 @@ export default function Home() {
   },[currentFilter, kakaoMapLoaded, fetchStations])
 
   // 받은 list markers에 넣기
-  const markers = respDummies.map((item) => ({ // 🍕 respDummies 로 변경
+  const markers = list.map((item) => ({ // 🍕 respDummies 로 변경
     id: item.statId,
     name: item.statNm,
     lat: item.lat,
@@ -170,52 +177,55 @@ export default function Home() {
   const searchPlaces = () =>{
     const keyword = searchRef.current?.value;
 
+    const nextFilter = {
+      ...currentFilter,
+      keyWord: keyword
+    }
+    console.log(nextFilter);
+    setCurrentFilter(nextFilter);
+    
+
     // 카카오API가 로드되었는지 확인하는 kakaoMapLoaded
-    if(!kakaoMapLoaded){
-      alert('지도를 로드하는 중입니다. 잠시후 다시 시도해주세요.');
-      return;
-    }
-    if(!keyword){
-      alert('검색어를 입력하세요')
-      return;
-    }
+    // if(!kakaoMapLoaded){
+    //   alert('지도를 로드하는 중입니다. 잠시후 다시 시도해주세요.');
+    //   return;
+    // }
+    // if(!keyword){
+    //   alert('검색어를 입력하세요')
+    //   return;
+    // }
 
-    const ps = new window.kakao.maps.service.Places();
-    ps.keywordSearch(keyword, (data: Place[], status: any, pagination: any) => {
-      // 키워드 리스트 추출
-      if(status === window.kakao.maps.service.Status.OK ){
-        setPlaces(data);
-      } else if(status === window.kakao.maps.service.Status.ZERO_RESULT){
-        alert('검색 결과가 없습니다.');
-        setPlaces([]);
-      } else if(status === window.kakao.maps.service.Status.ERROR){
-        alert('검색 중 오류가 발생했습니다.');
-        setPlaces([]);
-      }
-    });
+    // const ps = new window.kakao.maps.service.Places();
+    // ps.keywordSearch(keyword, (data: Place[], status: any, pagination: any) => {
+    //   // 키워드 리스트 추출
+    //   if(status === window.kakao.maps.service.Status.OK ){
+    //     setPlaces(data);
+    //   } else if(status === window.kakao.maps.service.Status.ZERO_RESULT){
+    //     alert('검색 결과가 없습니다.');
+    //     setPlaces([]);
+    //   } else if(status === window.kakao.maps.service.Status.ERROR){
+    //     alert('검색 중 오류가 발생했습니다.');
+    //     setPlaces([]);
+    //   }
+    // });
   }
 
-  const handlePlaceSelect = (place: Place) => {
-    // 선택된 장소 경도, 위도 추출
-    const lat = parseFloat(place.y); // 위도
-    const lng = parseFloat(place.x); // 경도
-    setCurrentFilter((prev) => ({
-      ...prev,
-      lat,  
-      lon: lng,
-    }));
-    setMyPos([lat, lng]);
-    setPlaces([]);  // 검색 결과 목록 숨김
-  }
+  // const handlePlaceSelect = (place: Place) => {
+  //   // 선택된 장소 경도, 위도 추출
+  //   const lat = parseFloat(place.y); // 위도
+  //   const lng = parseFloat(place.x); // 경도
+  //   setCurrentFilter((prev) => ({
+  //     ...prev,
+  //     lat,  
+  //     lon: lng,
+  //   }));
+  //   setMyPos([lat, lng]);
+  //   setPlaces([]);  // 검색 결과 목록 숨김
+  // }
 
   // 6. 필터 완료버튼 클릭했을 시
   const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
     setIsFilterOpen(false); //모달닫기
-    // 넘어온 정보들만 필터 씌우기
-    // setCurrentFilter((prev) => ({
-    //   ...prev,
-    //   ...newFilters
-    // }));
 
     // currentFilter에 newFilter씌운 객체
     const nextFilter = {
@@ -232,13 +242,29 @@ export default function Home() {
 
   // 7. 리스트 아이템 클릭시 지도 이동 및 상세정보 표시
   const handleStaionClick = (station: ChargingStationResponseDto) => {
-    setMyPos([station.lat, station.lng]);
+    setMapCenter([station.lat, station.lng]);
+    console.log('선택한 충전소 정보:',station);
     setSelectedStation(station);
   }
 
   // 8. 상세정보 패널 닫기
   const handleCloseDetailPanel = () => {
     setSelectedStation(null);
+  }
+
+  // 9. 지도 현위치에서 검색
+  const handleSearchHere = (center: any) =>{
+    const lat = center.getLat();
+    const lng = center.getLng();
+    console.log('지도중심 좌표: ', lat, lng);
+    setMyPos([lat, lng]);
+    setMapCenter([lat, lng]);
+    
+    setCurrentFilter(prev => ({
+      ...prev,
+      lat: lat,
+      lon: lng,
+    }));
   }
 
 
@@ -260,7 +286,10 @@ export default function Home() {
           </div>
           {/* 검색 */}
           <div className="pb-4 border-b border-[#f2f2f2]">
-          <input type="text" ref={searchRef} placeholder="장소를 검색하세요" className={style.searchInput}/>
+            <div className={style.searchInput}>
+              <input type="text" ref={searchRef} placeholder="충전소를 검색하세요" className="outline-none" />
+              <button className="pr-5 px-2 py-1 pt-1 cursor-pointer" onClick={()=>{searchPlaces()}}><TfiSearch/></button>
+            </div>
             {/* <button onClick={()=>searchPlaces()} disabled={!kakaoMapLoaded}>검색</button>
             {places.length > 0 ? (
               <ul>
@@ -278,7 +307,7 @@ export default function Home() {
           {/* 충전소 목록 */}
           {/* <h4>충전소 목록</h4> */}
           <ul className="scrollContent">
-            {respDummies.map((item) => ( // 🍕 respDummies 로 변경
+            {list.map((item) => ( // 🍕 respDummies 로 변경
               <li key={item.statId} className={style.listSection} onClick={()=>handleStaionClick(item)}>
                 <h4 className='text-[15px]' style={{color:'#232323'}}>{item.statNm}</h4>
                 <p className='text-[12px]' style={{color:'#666'}}>{item.addr}</p>
@@ -293,8 +322,8 @@ export default function Home() {
         </div>
         {/* 오른쪽 - 지도 */}
         <div className="flex-grow">
-          <ChargingMap markers={markers} myPos ={myPos} 
-                        selectedStationId={selectedStation?.statId}/>
+          <ChargingMap  myPos ={myPos} radius={currentFilter.radius} posHere={handleSearchHere} mapCenter={mapCenter} //충전소마커, 현지도위치, 반경, 현지도위치콜백, 맵의중심(충전소선택, 현재위치 구분을위해서) 
+                        markers={markers} selectedStationId={selectedStation?.statId}/>
           {/* <div className="fixed h-full top-20 left-[calc(30%+2rem)] z-50"> */}
           {selectedStation && (
             <StationDetailPanal station={selectedStation}

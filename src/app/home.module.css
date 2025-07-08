@@ -10,10 +10,12 @@
 
 .searchInput{
     width: 100%; 
-    padding: 10px 5px 10px 15px ;
-    margin-bottom: 7;
+    padding: 10px 0px 10px 15px ;
+    /* margin-bottom: 7; */
     background: rgba(79, 169, 105, 0.1);
-    border-radius: 999px;  
+    border-radius: 999px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .searchInput::placeholder {

@@ -6,7 +6,10 @@ import style from './ChargingMap.module.css'
 interface ChargingMapProps {
     markers: MarkerType[];
     myPos: [number, number] | null;
+    radius: number;
     selectedStationId?: string | null;
+    posHere: (center: any) => void;
+    mapCenter: [number, number] | null;
 }
 
 type MarkerType = {
@@ -24,12 +27,13 @@ type MarkerType = {
 // // 마커 이미지 크기
 // const MARKER_IMAGE_SIZE = new window.kakao.maps.Size(24, 35);
 
-export default function ChargingMap({ markers, myPos, selectedStationId }: ChargingMapProps) {
+export default function ChargingMap({ markers, myPos, radius, selectedStationId, posHere, mapCenter }: ChargingMapProps) {
     const [isMapReady, setIsMapReady] = useState(false);    // 지도준비상태 추적
     const mapRef = useRef<any>(null);       // map객체 저장용
     const mapInstance = useRef<any>(null);  // 지도 인스턴스 저장
     // key: marker.id, value: kakao.maps.Marker 인스턴스
     const markerInstances = useRef<Map<string, any>>(new Map());
+    const circleRef = useRef<any | null>(null);   //반경ref
 
     // 1. 지도 초기화(컴포넌트 마운트시)
     useEffect(() => {
@@ -50,7 +54,6 @@ export default function ChargingMap({ markers, myPos, selectedStationId }: Charg
                 
                 console.log('[✅ 지도 생성 완료]', map);
 
-
                 // 💡 강제로 리사이즈 발생 (화면 제대로 갱신되도록)
                 setTimeout(() => {
                     map.relayout();
@@ -62,14 +65,41 @@ export default function ChargingMap({ markers, myPos, selectedStationId }: Charg
         }
     }, []);
 
-    // 2. myPos변경시 지도중심 이동
+    // 2. mapCenter변경시 지도중심 이동
     useEffect(()=>{
-        console.log('[🔍 myPos 체크]', myPos);
-        if(isMapReady  && mapInstance.current && myPos){
-            const moveLatLon = new window.kakao.maps.LatLng(myPos[0], myPos[1]);
+        console.log('[mapCenter 체크]', mapCenter);
+        if(isMapReady  && mapInstance.current && mapCenter){
+            const moveLatLon = new window.kakao.maps.LatLng(mapCenter[0], mapCenter[1]);
             mapInstance.current.setCenter(moveLatLon);
+            
         }
-    },[myPos, isMapReady])
+    },[mapCenter, isMapReady])
+
+    // 3. myPos변경시 반경설정
+    useEffect(() => {
+    if (isMapReady && mapInstance.current && myPos) {
+        const circleCenter = new window.kakao.maps.LatLng(myPos[0], myPos[1]);
+
+        // 기존 원 제거
+        if (circleRef.current) {
+        circleRef.current.setMap(null);
+        }
+
+        // 새 원 생성
+        const newCircle = new window.kakao.maps.Circle({
+        center: circleCenter,
+        radius: radius,
+        strokeWeight: 2,
+        strokeColor: '#4FA969',
+        strokeOpacity: 0.5,
+        fillColor: '#4FA969',
+        fillOpacity: 0.3,
+        });
+
+        newCircle.setMap(mapInstance.current);
+        circleRef.current = newCircle;
+    }
+    }, [myPos, radius, isMapReady]);
 
     // 3. markers 또는 selectedStationId 변경 시 마커 업데이트
     useEffect(() => {
@@ -104,8 +134,6 @@ export default function ChargingMap({ markers, myPos, selectedStationId }: Charg
             const existingMarker = markerInstances.current.get(markerDt.id);
             const isSelected = markerDt.id === selectedStationId;
             const isAvailable = markerDt.availableCnt > 0;
-            // const imageUrl = isSelected ? SELECTED_MARKER_IMAGE_URL : DEFAULT_MARKER_IMAGE_URL;
-            // const markerImg = new window.kakao.maps.MarkerImage(imageUrl, new window.kakao.maps.Size(24, 35));
 
             // 이미지 생성
             let imageUrl: any;
@@ -188,8 +216,21 @@ export default function ChargingMap({ markers, myPos, selectedStationId }: Charg
         }) 
     }, [markers, selectedStationId, isMapReady])
 
+    const handleSearchHere = () => {
+        if (mapRef.current) {
+            const center = mapInstance.current.getCenter();
+            posHere(center); // 부모로 전달
+    }
+    }
+
     return (
-        <div ref={mapRef} style={{ width: "100%", height: "100%" }}></div>
+        <div className="relative w-full h-full">
+            <div ref={mapRef} style={{ width: "100%", height: "100%" }}></div>
+            <button className="absolute bottom-4 right-4 bg-white border px-4 py-2 rounded shadow z-10"
+                    onClick={handleSearchHere}>
+                현 지도에서 검색
+            </button>
+        </div>
     )
 }
 

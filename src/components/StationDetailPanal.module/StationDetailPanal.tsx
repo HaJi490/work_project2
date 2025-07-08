@@ -1,6 +1,12 @@
-import React from 'react'
+'use client'
+
+import {useRef, useEffect, useState} from 'react'
 import { ChargingStationResponseDto, ChargerInfoMap, ChargerInfoItem } from '@/types/dto'
-import codeToNm from '../db/chgerType.json'
+import { DayPicker } from 'react-day-picker'
+import "react-day-picker/style.css";
+import codeToNm from '../../db/chgerType.json'
+
+import style from './StationDetailPanal.module.css'
 
 interface StationDetailPanalProps {
     station: ChargingStationResponseDto;
@@ -8,7 +14,31 @@ interface StationDetailPanalProps {
 }
 
 export default function StationDetailPanal({ station, onClose }: StationDetailPanalProps) {
+    const panelRef = useRef<HTMLDivElement>(null);                  // 전체 판넬닫기
+    const reservRef = useRef<HTMLDivElement>(null);                 // 예약 판넬닫기
+    const [showReserv, setShowReserv] = useState<boolean>(false);   // 예약창 뜨기
+    const [selectedChger, setSelectedChger] = useState<ChargerInfoItem>();
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('시간대 선택');
+
     if (station == null) return null;
+
+    // 다른곳 누르면 닫힘
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+                onClose(); // 바깥 클릭 시 닫기
+            }// 클릭된 곳이 StationDetailPanel 내부이지만 예약창(reservPanelRef) 외부인 경우
+            else if (showReserv && reservRef.current && !reservRef.current.contains(e.target as Node)) {
+                setShowReserv(false); // 예약창만 닫기
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [onClose, showReserv]);
 
     // string -> date
     const parseTimestamp = (respDt: string) => {
@@ -48,11 +78,20 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
         const match =  codeToNm.find(type => chgerCode.includes(type.code));
         return match?.type || ''; // 맞는게 있으면 이름(type) 반환, 아니면 ''                      
     } 
+
+    // 예약화면
+    const handleChgReservation = (charger : ChargerInfoItem) => {
+        setShowReserv(true);
+        setSelectedChger(charger);
+        setSelectedDate(undefined);         // 초기화
+        setSelectedTimeSlot('시간대 선택');  // 초기화
+        // 요청해서 예약현황들고오기
+    }
     
 
     return (
-        <div className="absolute top-125 left-155 h-full -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-20 w-100 max-h-[80vh] ">
-            <div className='h-full flex flex-col overflow-y-auto'>
+        <div ref={panelRef} className="absolute top-125 left-155 h-full -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-20 w-100 max-h-[80vh]">
+            <div className='h-full flex flex-col overflow-y-auto relative'>
                 <header className=" ">
                     <div className='flex my-2'>
                         <p className="text-sm text-gray-700 mr-2 px-3 bg-[#4FA969] rounded-[50]">
@@ -69,8 +108,8 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
                 </header>
                 <p className="text-sm text-gray-600 mb-2">{station.addr}</p>
                 {/* <h4 className="font-semibold text-gray-800 mb-1">운영 정보</h4> */}
-                {station.chargerInfo['01'].useTime && <p className="text-sm text-gray-700">운영 시간: {station.chargerInfo['01'].useTime}</p>}
-                    {station.chargerInfo['01'].busiNm && <p className="text-sm text-gray-700">문의: {station.chargerInfo['01'].busiNm}</p>}
+                {/* {station.chargerInfo['01'].useTime && <p className="text-sm text-gray-700">운영 시간: {station.chargerInfo['01'].useTime}</p>}
+                {station.chargerInfo['01'].busiNm && <p className="text-sm text-gray-700">문의: {station.chargerInfo['01'].busiNm}</p>} */}
 
                 <div className="mb-4">
                     {/* <h4 className="font-semibold text-gray-800 mb-1">충전기 정보</h4> */}
@@ -93,7 +132,8 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
                         const chgerType = charger.chgerType;
 
                         return(
-                            <div key={chgerId} className="m-1 px-3 py-2 border border-[#4FA969] rounded">
+                            <button key={chgerId} onClick={()=>handleChgReservation(charger)}
+                                    className="m-1 px-3 py-2 border border-[#4FA969] rounded text-left">
                                 <div className='font-bold text-[#4FA969] flex justify-between'>
                                     <p className=''>{stat === '2' ? '충전가능': '사용중' }</p>
                                     <p>{chgerId}</p>
@@ -101,17 +141,24 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
                                 {/* <p>{nowTsdt}</p> */}
                                 <p>{typeCodeToNm(chgerType)}</p>
                                 <p>{getTimeAgo(lastTsdt)}</p>
-                            </div>
+                            </button>
                         )
 
                     })}
                 </div>
+                {showReserv && selectedChger &&
+                    <div className='w-full pt-4 border-t absolute bottom-0 bg-white z-10'style={{borderColor:'#f2f2f2'}}>
+                        <div>
+                            <p>{selectedChger.chgerId}</p>
+                            <p>타입: {typeCodeToNm(selectedChger.chgerType)}</p>
+                            {/* <p>상태: {selectedChger.stat === '2' ? '충전가능' : '사용중'}</p> */}
+                        </div>
+                        <DayPicker animate mode='single' selected={selectedDate} onSelect={setSelectedDate}
+                                    footer={selectedDate ? `${selectedDate}` : '날짜선택'}/>
+                        <button></button>
+                    </div>
+                }
             </div> 
-            <div className='w-full pt-4 border-t absolute bottom-0 bg-white z-10'style={{borderColor:'#f2f2f2'}}>
-                <p>현재위치에서 ddddddddd</p> 
-                <p>현재위치에서 ddddddddd</p> 
-                
-            </div>
 
                 {/* <div className="mt-4 text-right">
                     <button

@@ -14,8 +14,17 @@
      예: max-height: calc(100vh - 200px); */
 }
 
-.stateBadge{
-  
+.propYn{
+    border: 1px solid #4FA969;
+    border-radius: 0.25rem;
+    padding: 4px 10px;
+    color: #4FA969;
+}
+
+.propYn.active {
+  background-color: #4FA969;
+  color: white;
+  border-color: #4FA969;
 }
 
 @theme inline {
