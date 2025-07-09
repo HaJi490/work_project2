@@ -1,6 +1,9 @@
-import React from 'react'
+'useclient'
+
+import React, { useEffect, useState } from 'react'
 import { ChargingStationResponseDto, ChargerInfoMap, ChargerInfoItem } from '@/types/dto'
 import codeToNm from '../db/chgerType.json'
+import { FaRegStar } from "react-icons/fa";
 
 interface StationDetailPanalProps {
     station: ChargingStationResponseDto;
@@ -9,6 +12,9 @@ interface StationDetailPanalProps {
 
 export default function StationDetailPanal({ station, onClose }: StationDetailPanalProps) {
     if (station == null) return null;
+
+    const [star, setStar] = useState();
+
 
     // string -> date
     const parseTimestamp = (respDt: string) => {
@@ -50,6 +56,10 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
     } 
     
 
+    useEffect(()=>{
+
+    },[])
+
     return (
         <div className="absolute top-125 left-155 h-full -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-20 w-100 max-h-[80vh] ">
             <div className='h-full flex flex-col overflow-y-auto'>
@@ -62,7 +72,12 @@ export default function StationDetailPanal({ station, onClose }: StationDetailPa
                             {station.parkingFree ? '무료주차' : '유료주차'}
                         </p>
                     </div>
-                    <h3 className="text-lg font-bold text-[#4FA969]">{station.statNm}</h3>
+                    <div className="flex place-content-between text-lg font-bold text-[#4FA969]">
+                        {station.statNm}
+                        <div className='cursor-pointer'>
+                            {<FaRegStar />}
+                        </div>
+                    </div>
                     <button className="absolute top-4 right-4 text-2xl" onClick={onClose}>
                         &times;
                     </button>

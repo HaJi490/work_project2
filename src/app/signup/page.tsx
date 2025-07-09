@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import Nav from "@/components/Nav/Nav";
 import Script from "next/script";
 import axios, { AxiosError } from "axios";
@@ -11,6 +11,7 @@ import { FiEdit } from "react-icons/fi";
 import { BiSolidCar } from "react-icons/bi";
 import { LiaCarSideSolid } from "react-icons/lia";
 import { FiCheckCircle } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window {
@@ -26,17 +27,19 @@ type StepItem = {
 export default function signup() {
     const [username, setUsername] = useState<string>('');
     const [id, setId] = useState<string>('');
-    const [isIdValid, setIsIdValid] = useState<boolean | null >(null);
+    const [isIdValid, setIsIdValid] = useState<boolean | null >(false);
     const [validMsg, setValidMsg] = useState<string | null >(null);
 
     const [pwd, setPwd] = useState<string>('');
-    const [isPwdValid, setIsPwdValid] = useState<boolean | null>(null);
+    const [isPwdValid, setIsPwdValid] = useState<boolean | null>(false);
     const [showPwdCondition, setShowPwdCondition] = useState<boolean>(false);   // 메시지 표시여부
     const [pwdConfirm, setPwdConfirm] = useState<string>('');
     const [pwdConfirmMsg, setPwdConfirmMsg] = useState<string | null>(null);
     const [isPwdConfirmValid, setIsPwdConfirmValid] = useState<boolean | null>(null);
 
     const [phone, setPhone] = useState<string>('');
+    const [phoneMiddle, setPhoneMiddle] = useState<string>('');
+    const [phoneLast, setPhoneLast] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [domainOpt, setDomainOpt] = useState<string>('직접입력');
     const [customDomain, setCustomDomain] = useState<string>('');
@@ -44,26 +47,37 @@ export default function signup() {
     const [gender, setGender] = useState<'male' | 'female' | undefined>();
     const [zoneCode, setZoneCode] = useState('');
     const [roadAddress, setRoadAddress] = useState('');
+    const [detailAddress, setDetailAddress] = useState('');
     const [addr, setAddr] = useState<string>('');
 
     const MIN_ID_LENGTH = 4 ;      // 아이디 최소 4자
     const MIN_PW_LENGTH = 8;       // 비밀번호 최소 8자
     const MIN_NAME_LENGTH = 2;     // 이름 최소 2자
 
-
+    const router = useRouter()
 
     const steps: StepItem[] = [
         {label: "회원정보", icon: <FiEdit/> },
-        {label: "차량정보", icon: <BiSolidCar/> },
         {label: "가입완료", icon: <FiCheckCircle/> }
     ]
 
     // id 중복확인
     const checkValid = async() => {
         console.log({username: id});
+        setIsIdValid(false)
+        if(id == null || id === "" || id.length < 5){
+            setValidMsg("아이디는 5자 이상이어야 합니다.")
+            return;
+        }
+        const pattern1 = /[^a-zA-Z0-9]/
+        if(pattern1.test(id)){
+            setValidMsg("아이디는 영문대소문자 숫자만 가능합니다.")
+            return
+        }
+
         try{
             const res = await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/user/join/valid`, 
-                                        {username: id},{headers:{'Content-Type': 'application/json'}});
+                                        {username: id,password : "temp"},{headers:{'Content-Type': 'application/json'}});
             setIsIdValid(true);
             setValidMsg(res.data);
         } catch (error){
@@ -106,7 +120,6 @@ export default function signup() {
     }
 
     setIsPwdValid(true);
-    setPwd(ePwd);
     return '사용 가능한 비밀번호입니다.';
     
     // return lengthCheck && upperCheck && lowerCheck && numberCheck && specialCheck
@@ -162,29 +175,52 @@ export default function signup() {
 
     // 회원정보 등록
     const submitMember = async() => {
+
+        if(!isIdValid)
+        {
+            alert("아이디 중복 확인")
+            return;
+        }
+        if(!isPwdValid)
+        {
+            alert("비밀번호는 8자 이상, 소문자, 숫자, 특수문자 각각 하나 이상 포함해야합니다.")
+            return;
+        }
+
+            
         const requestBody: SignupRequest = {
             username: id,
             nickname: username,
             password: pwd,
-            phoneNumber: formatPhoneNumber(phone),
+            phoneNumber: formatPhoneNumber(phone + phoneMiddle + phoneLast),
             email: `${email}@${customDomain}`,
             sex: gender,
+            zipcode: zoneCode,
+            roadAddr: roadAddress,
+            detailAddr : detailAddress,
             createAt: new Date(),
             ...(addr && {address: `${roadAddress} ${addr}`}),
         }
 
         try{
             console.log(requestBody);
-            await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/user/join`,requestBody);
+            const resp = await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/user/join`,requestBody);
+            //정상이면 가입완료 페이지로
+            console.log(resp)
+            // router.push('success')
+            if(resp['status'] === 200){
+                router.push('/signup/success')
+            }
         } catch(error){
+            alert("필수입력 정보를 확인바랍니다.")
             console.error('submitMember: ', error);
         }
     }
-
+useEffect(()=>{  
+    isValidPassword(pwd)
+},[isValidPassword]);
 
   return (
-    <div className="w-full min-h-screen flex flex-col">
-        <Nav />
         <main className="w-full py-25 flex flex-col justify-center items-center px-4">
             <h2 className='text-center font-medium text-[28px] tracking-wide mb-6'>회원가입</h2>
             {/* step UI */}
@@ -223,7 +259,7 @@ export default function signup() {
                     <div className="flex gap-2 items-start">
                         <div className="w-full max-w-[450px]">
                             <input type='text' value={id} onChange={(e) => setId(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`} />
-                            {validMsg && <p className={`text-[12px] mt-1 ${isIdValid? 'text-[#4FA969]' : 'text-[#D42D2D]'}`} >{validMsg}</p>}
+                            {validMsg && <p className={`text-[12px] mt-1 ${isIdValid ? 'text-[#4FA969]' : 'text-[#D42D2D]'}`} >{validMsg}</p>}
                         </div>
                         <button type="button" onClick={()=>{checkValid()} }className="h-[50px] border border-[#afafaf] rounded text-[#666666] px-4 py-3 ml-4 cursor-pointer"> 중복확인</button>
                     </div> 
@@ -231,9 +267,9 @@ export default function signup() {
                     {/* 비밀번호 */}
                     <label>비밀번호</label>
                     <div className="w-full max-w-[450px]">
-                        <input type="password" value={pwd} onChange={(e) => isValidPassword(e.target.value.trim())} 
+                        <input type="password" value={pwd} onChange={(e) => setPwd(e.target.value.trim())} 
                                 onFocus={()=>setShowPwdCondition(true)} onBlur={(e) => {setShowPwdCondition(false)}}className={`${style.inputbox} max-w-[450px]`} />
-                        {showPwdCondition && <p className='text-[12px] mt-1'>비밀번호는 8자 이상, 소문자, 숫자, 특수문자 각각 하나 이상 포함해야합니다.</p>}
+                        {!isPwdValid && <p className='text-[12px] mt-1 text-[#D42D2D]'>비밀번호는 8자 이상, 소문자, 숫자, 특수문자 각각 하나 이상 포함해야합니다.</p>}
                     </div>
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                     <label>비밀번호 확인</label>
@@ -242,7 +278,9 @@ export default function signup() {
                     {/* 휴대폰번호 */}
                     <label>휴대폰 번호</label>
                     <div>
-                        <input type="text" placeholder='숫자만 입력해주세요' value={phone} onChange={(e) => setPhone(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`}/>
+                        <input type="text" placeholder='' value={phone} onChange={(e) => e.target.value.trim().length < 4 ? setPhone(e.target.value.trim()) : ""} className={`${style.inputbox} max-w-[200px] text-center`}/>&ensp;-&ensp; 
+                        <input type="text" placeholder='' value={phoneMiddle} onChange={(e) => e.target.value.trim().length < 5 ? setPhoneMiddle(e.target.value.trim()) : ""} className={`${style.inputbox} max-w-[200px] text-center`}/>&ensp;-&ensp; 
+                        <input type="text" placeholder='' value={phoneLast} onChange={(e) => e.target.value.trim().length < 5 ? setPhoneLast(e.target.value.trim()) : ""} className={`${style.inputbox} max-w-[200px] text-center`}/>
                         {/* &ensp;-&ensp;
                         <input type="text" className={`${style.inputbox} max-w-[150px]`}/>&ensp;-&ensp;
                         <input type="text" className={`${style.inputbox} max-w-[150px]`}/> */}
@@ -277,23 +315,21 @@ export default function signup() {
                 <hr className="border-[#afafaf] border-[1.5px] mb-3"/>
                 <div className="grid grid-cols-[1fr_3fr] gap-4 mb-4 justify-center">
                     <label>주소</label>
-                    <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
                     <div className="flex flex-col gap-4">
                         <div>
                             <input type="text" value={zoneCode} onChange={(e) => setZoneCode(e.target.value)} readOnly className={`${style.inputbox} max-w-[200px]`}/>
                             <button type="button" onClick={openDaumPostcode} className="border border-[#afafaf] text-[#666666] rounded px-4 py-3 ml-4 cursor-pointer">우편번호 검색</button>
                         </div>
                         <input type="text" value={roadAddress} onChange={(e) => setZoneCode(e.target.value)} readOnly className={style.inputbox}/>
-                        <input type="text" placeholder="상세주소를 입력해주세요" className={style.inputbox}/>
+                        <input type="text" value={detailAddress} placeholder="상세주소를 입력해주세요" onChange={(e)=> setDetailAddress(e.target.value)} className={style.inputbox}/>
                     </div>
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                 </div>
             </div>
             <div className="flex gap-5">
-                <button className={`${style.btn} ${style.cancel}`}>취소</button>
-                <button onClick={()=>{submitMember()}} className={`${style.btn} ${style.confirm}`}>가입</button>
+                <button className={`${style.btn} ${style.cancel} cursor-pointer`}>취소</button>
+                <button onClick={()=>{submitMember()}} className={`${style.btn} ${style.confirm} cursor-pointer`}>가입</button>
             </div>
         </main>
-    </div>
   )
 }

@@ -243,9 +243,6 @@ export default function Home() {
 
 
   return (
-    // grid grid-rows-[20px_1fr_20px] p-8 pb-20 gap-16 sm:p-20/
-    <div className="w-full h-full items-center justify-items-center min-h-screen   font-[family-name:var(--font-geist-sans)]">
-      <Nav/>
       <div className={style.mainContainer}>
         {/* 왼쪽 */}
         <div className="w-100 h-full flex flex-col p-10 bg-white z-10 shadow-md">
@@ -304,7 +301,5 @@ export default function Home() {
           {/* </div> */}
         </div>
       </div>
-
-    </div>
   );
 }
