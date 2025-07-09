@@ -76,6 +76,7 @@ export interface ChargingStationResponseDto {
   busiId: string;
   busiNm: string;
   chargerInfo: ChargerInfoMap;
+  useTime: string;
 }
 
 
@@ -92,7 +93,23 @@ export interface SignupRequest {
 }
 
 
+// 예약현황 request
+export interface ReservationStatusRequestDto {
+  statId: string;
+  date: string;      // 예: "2025-07-06"
+  chgerId: string;
+}
 
+// 예약현황 response
+export interface TimeInfo {
+  statId: string;
+  chgerId: string;
+  timeId: number;
+  date: string;         // 예: "2025-07-06"
+  startTime: string;    // 예: "00:00:00"
+  endTime: string;      // 예: "00:29:59"
+  enabled: boolean;
+}
 
 
 

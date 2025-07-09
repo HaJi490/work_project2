@@ -56,7 +56,8 @@ export default function Home() {
   }); 
   const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);         // map에 쓰일 현재위치_ 반경표시
   const [mapCenter, setMapCenter] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]); // map의 중심
-  const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null >(null); // 선택된 충전소
+  const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null >(null);     // 선택된 충전소
+  const closeDetailRef = useRef<HTMLButtonElement>(null);  // 필터누르면 detailpenal 꺼지게
   
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
   // const [places, setPlaces] = useState<Place[]>([]);               // 검색어에 따른 리스트
@@ -252,6 +253,10 @@ export default function Home() {
     setSelectedStation(null);
   }
 
+  useEffect(()=>{
+    setSelectedStation(null);
+  }, [closeDetailRef])
+
   // 9. 지도 현위치에서 검색
   const handleSearchHere = (center: any) =>{
     const lat = center.getLat();
@@ -277,7 +282,7 @@ export default function Home() {
         <div className="w-100 h-full flex flex-col p-10 bg-white z-10 shadow-md">
           <div className='flex flex-row justify-between'>
             <h3 className=" font-semibold mb-4" style={{color:"#4FA969"}}> 충전소 찾기</h3>
-            <button onClick={()=>setIsFilterOpen(true)}
+            <button ref={closeDetailRef} onClick={()=>setIsFilterOpen(true)}
               className='text-[24px] cursor-pointer' style={{color:'#666'}}><HiOutlineAdjustmentsHorizontal/></button>
               <FilterModal isOpen={isFilterOpen} 
                           onClose={()=>setIsFilterOpen(false)}
@@ -327,7 +332,8 @@ export default function Home() {
           {/* <div className="fixed h-full top-20 left-[calc(30%+2rem)] z-50"> */}
           {selectedStation && (
             <StationDetailPanal station={selectedStation}
-                                onClose={handleCloseDetailPanel} />
+                                onClose={handleCloseDetailPanel} 
+                                closeDetailRef={closeDetailRef}/>  //outsideClickRefs={closeDetailRef}
           )}
 
           {/* </div> */}

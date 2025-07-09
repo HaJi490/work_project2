@@ -17,11 +17,11 @@ interface filterProps{
 
 export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}: filterProps) {
     const [canUse, setCanUse] = useState<boolean>(initialFilters.canUse);                // 사용가능
-    const [parkingFree, setParkingFree] = useState<boolean>(initialFilters.parkingFree);      // 무료주차
+    const [parkingFree, setParkingFree] = useState<boolean>(initialFilters.parkingFree);   // 무료주차
     const [limitYn, setLimitYn] = useState<boolean>(initialFilters.limitYn);              // 개방
     const [selectedRange, setSelectedRange] = useState<number>(initialFilters.radius);
     const [selectedSpeedMin, setSelectedSpeedMin] = useState<number>(initialFilters.outputMin);
-    const [selectedSpeedMax, setSelectedSpeedMax] = useState<number>(initialFilters.outputMin);
+    const [selectedSpeedMax, setSelectedSpeedMax] = useState<number>(initialFilters.outputMax);
     const [selectedChargerTypes, setSelectedChargerTypes] = useState<string[]>(initialFilters.chargerTypes); // 커넥터타입 선택상태
     const [selectedChargerComps, setSelectedChargerComps] = useState<string[]>(initialFilters.chargerComps); // 충전사 선택상태
     // slider의 min/max값
@@ -106,6 +106,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
 
     // 속성 버튼 클릭 핸들러
     const handlePropToggle = (propName: 'canUse' | 'parkingFree' | 'limitYn')=>{
+        console.log(initialFilters);
         switch(propName){
             case 'canUse':
                 setCanUse(prev => !prev); 
