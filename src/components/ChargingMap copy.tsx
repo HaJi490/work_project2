@@ -136,22 +136,29 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
             const isAvailable = markerDt.availableCnt > 0;
 
             // 이미지 생성
-            let imageUrl: any;
+            let imageUrl: string;
+            let imageSize: any;
             if(isSelected){
                 imageUrl = '/selectedmarker.jpg';
+                imageSize = new window.kakao.maps.Size(32, 32);
+            } else if (isAvailable){
+                imageUrl = '/available.png';
+                imageSize = new window.kakao.maps.Size(32, 32);
             } else {
-                imageUrl = isAvailable ? '/marker1.png' : '/unavailable.png';
+                imageUrl = '/unavailable.png';
+                imageSize = new window.kakao.maps.Size(12, 12);
             }
 
             // MarkerImage 생성
             const markerImg = new window.kakao.maps.MarkerImage(
                 imageUrl,
-                new window.kakao.maps.Size(24, 35)  // 크기는 실제 이미지에 맞게 조정
+                imageSize
             );
 
             // 커스텀오버레이 내용
             let overlayContent = '';
-            let overlayClass = '{style.custom-overlay-default}'; //기본 스타일 클래스
+            let overlayClass = style.customOverlayDefault; //기본 스타일 클래스
+            console.log(overlayClass);
             if(isAvailable){
                 overlayContent=`<div className="${overlayClass}">${markerDt.availableCnt}</div>`
             }

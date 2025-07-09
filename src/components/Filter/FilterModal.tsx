@@ -132,8 +132,8 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     }
 
     // 커넥터 타입 체크박스 핸들러
-    const handleConnectorType = (event: React.ChangeEvent<HTMLInputElement>)=>{
-        const {value, checked} = event.target;
+    const handleConnectorType = (value: string, checked: boolean)=>{    // 선택되어 있지 않으면 true, 선택되어 있으면 false
+        // const {value, checked} = event.target;
         setSelectedChargerTypes((prev) =>
             checked ? [...prev, value] : prev.filter((type) => type !== value)  // 이전 prev 배열의 모든 요소를 복사(스프레드 문법)하고, value를 그 뒤에 추가하여 새로운 배열을 만듭니다. 
                                                                                 // type !== value는 현재 순회 중인 type이 event.target.value와 다르면 true를 반환합니다. 결과적으로, event.target.value와 같은 값만 필터링에서 제외되어 배열에서 제거
@@ -248,7 +248,8 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                     <div className="flex flex-wrap gap-2 mb-4">
                         {connectorTypes.map((item)=>(
                             <button key={item.value} className={`${style.propYn} ${selectedChargerTypes.includes(item.value) ? style.active : ''}`}
-                                    onClick={()=> handleConnectorType({target: {value: item.value, checked: !selectedChargerTypes.includes(item.value)}} as React.ChangeEvent<HTMLInputElement>)}>
+                                    onClick={()=> handleConnectorType(item.value, !selectedChargerTypes.includes(item.value))}>  
+                                    {/* 이벤트 객체(input태그에 있음)를 보내야하는데 button태그엔 없으니까 가짜event객체를 만들어서 보냄*/}
                                 {item.value}
                             </button>
                             

@@ -107,10 +107,6 @@ export default function page() {
                         </button>
                     ))}
                     <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
-                    {/* 출고년도 */}
-                    <label className=""> 출고년도</label>
-                    <input type="text" value={chulgoYear} onChange={(e) => setChulgoYear(e.target.value.trim())} className={`${style.inputbox} max-w-[450px]`} />
-                    <div className="col-span-2 border-[0.5px] border-[#f2f2f2]" />
                     
                 </div>
                 <h3 className='text-left font-medium text-[28px]'>선택입력 정보</h3>
