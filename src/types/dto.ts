@@ -88,7 +88,9 @@ export interface SignupRequest {
   phoneNumber: string;
   email: string;
   sex: 'male' | 'female'| undefined;
-  address?: string; // 선택 입력이므로 optional로 처리
+  zipcode?: string; // 선택 입력이므로 optional로 처리
+  roadAddr?: string; // 선택 입력이므로 optional로 처리
+  detailAddr?: string; // 선택 입력이므로 optional로 처리
   createAt: string | Date; // Date 객체일 수도 있고, ISO 문자열일 수도 있음
 }
 
