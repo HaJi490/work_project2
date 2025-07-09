@@ -156,12 +156,17 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
             );
 
             // 커스텀오버레이 내용
-            let overlayContent = '';
+            // let overlayContent = '';
             let overlayClass = style.customOverlayDefault; //기본 스타일 클래스
-            console.log(overlayClass);
-            if(isAvailable){
-                overlayContent=`<div className="${overlayClass}">${markerDt.availableCnt}</div>`
-            }
+            // console.log(overlayClass);
+            // if(isAvailable){
+            //     overlayContent=`<div className="${overlayClass}">${markerDt.availableCnt}</div>`
+            // }
+            // 1. DOM 요소 직접 생성
+            const div = document.createElement('div');
+            div.className = overlayClass;
+            div.textContent = markerDt.availableCnt.toString();
+
 
             if(existingMarker){
                 // 이미 존재하는 마커는 업데이트(보통 이미지)
@@ -175,15 +180,15 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
                 if(isAvailable){
                     if(customOverlay){
                         // 기존에 있고 내용이 바뀌면 업데이트
-                        if(customOverlay.getContent() !== overlayContent){
-                            customOverlay.setContent(overlayContent);
+                        if(customOverlay.getContent() !== div){
+                            customOverlay.setContent(div);
                         }
                     } else {
                         // 새로운 커스텀 오버레이
                         const newOverlay = new window.kakao.maps.CustomOverlay({
                             map: mapInstance.current,
                             position: marker.getPosition(), // 마커와 동일한 위치
-                            content: overlayContent,
+                            content: div,
                             yAnchor: 2.2, // 마커 이미지에 따라 조정
                             clickable: true, // 클릭 가능 여부 (필요에 따라)
                         });
@@ -212,7 +217,7 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
                     newCustomOverlay = new window.kakao.maps.CustomOverlay({
                         map: mapInstance.current,
                         position: markerPosition,
-                        content: overlayContent,
+                        content: div,
                         yAnchor: 2.2, // 마커 이미지에 따라 조정 (위로 올리기)
                         clickable: true,
                     });

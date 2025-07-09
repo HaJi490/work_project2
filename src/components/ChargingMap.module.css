@@ -10,6 +10,7 @@
     text-align: center;
     position: relative;
     bottom: 2px; /* 마커 위에 오도록 위치 조정 */
+    /* margin-right: 10px; */
 }
 
 /* 필요하다면 선택된 상태의 오버레이 스타일도 추가 */

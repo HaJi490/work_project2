@@ -56,8 +56,7 @@ export default function page() {
 
 
   return (
-    <div  className="w-full min-h-screen flex flex-col">
-        <Nav />
+    <>
         <main className="w-full py-25 flex flex-col justify-center items-center px-4">
             <h2 className='text-center font-medium text-[28px] tracking-wide mb-6'>회원가입</h2>
             {/* step UI */}
@@ -125,6 +124,6 @@ export default function page() {
                 <button onClick={()=> {}} className={`${style.btn} ${style.confirm}`}>가입</button>
             </div>
         </main>
-    </div>
+    </>
   )
 }
