@@ -21,13 +21,6 @@
     border-color: #4FA969;
 }
 
-.propYn{
-    border: 1px solid #4FA969;
-    border-radius: 999px;
-    padding: 4px 10px;
-    color: #4FA969;
-}
-
 
 /* FilterModal.module.css */
 
@@ -74,5 +67,27 @@
   background-color: #4FA969;
   color: white;
   border-color: #4FA969;
+}
+
+/* 토스트알림 */
+.toast {
+    position: fixed;
+    bottom: 90px; /* 결과보기 버튼 바로 위에 위치하도록 조정 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 20px;
+    z-index: 100;
+    opacity: 0;
+    animation: fadeInOut 3s forwards; /* 3초 동안 나타났다가 사라짐 */
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
 }
 

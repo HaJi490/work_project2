@@ -3,8 +3,9 @@
 import React, { useRef, useEffect, useState } from 'react'
 import axios from 'axios'
 import { ChargingStationResponseDto, ChargerInfoMap, ChargerInfoItem } from '@/types/dto'
-import { DayPicker } from 'react-day-picker'
-import "react-day-picker/style.css";
+// import { DayPicker } from 'react-day-picker'
+// import "react-day-picker/style.css";
+import Calender from '../Calender'
 import codeToNm from '../../db/chgerType.json'
 
 import { TimeInfo } from '../../types/dto'
@@ -14,7 +15,7 @@ import style from './StationDetailPanal.module.css'
 interface StationDetailPanalProps {
     station: ChargingStationResponseDto;
     onClose: () => void;
-    closeDetailRef?: React.RefObject<HTMLElement>;
+    closeDetailRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 type DateFormatTp = 'korean' | 'iso';
@@ -32,7 +33,6 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
     const [getTimeslots, setGetTimeslots] = useState<TimeInfo[]>();
     const [timeFilter, setTimeFilter] = useState<string>('AM'); // 오전/오후
     // const timeslotRef = useRef<HTMLDivElement>(null);
-
 
     // 다른곳 누르면 닫힘
     useEffect(() => {
@@ -173,8 +173,6 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
             const timeStr = item.startTime.slice(0, 5);
             const isSelected = selectedTime.includes(timeStr); //bool
             const isDisabled = !item.enabled;
-            
-            
 
             return (                                            // map의 리턴
                 <button key={item.timeId}
@@ -207,7 +205,7 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
         const newSelected = checked ? [...selectedTime, value] : selectedTime.filter((time) => time !== value);
 
         // 선택된 타임id
-        const selectedTimeIds = getTimeslots?.filter(slot => selectedTime.includes(slot.startTime.slice(0,5)))
+        const selectedTimeIds = getTimeslots?.filter(slot => newSelected.includes(slot.startTime.slice(0,5)))   // selectedTime(x) newSelected(o)
                                             .map(slot => slot.timeId);
         // 연속되지않으면 경고
         if(!isConsecutive(selectedTimeIds || [])){
@@ -217,23 +215,32 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
         
         // 연속일 경우
         setSelectedTime(newSelected);
-        console.log(selectedTime);
+        console.log(newSelected);
     }
 
     // 예약요청 __ 로그인상태, 연속된 시간
     const handleReservationInfo = () => {
-        const selectedTimeIds = getTimeslots?.filter(slot => selectedTime.includes(slot.startTime.slice(0,5)))
-                                            .map(slot => slot.timeId);
-        if(!selectedTimeIds?.length){
+        if(!selectedTime?.length){
             alert('시간대를 선택해주세요.');
             return;
         }
+        const selectedTimeIds = getTimeslots?.filter(slot => selectedTime.includes(slot.startTime.slice(0,5)))
+                                            .map(slot => slot.timeId);
+
+        console.log('예약 시간대id: ', selectedTimeIds)
         const requestBody = {slotIds: selectedTimeIds} ;
+
         console.log('예약요청 데이터: ', requestBody );
 
-        axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reservation`, requestBody)    //  FIXME 백주소
+        axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reserve/setSlots`, requestBody,
+            {headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }}
+        )    //  FIXME 백주소
         .then((res) => {
             alert('예약이 완료되었습니다.');
+            setShowReserv(false);
+
         })
         .catch((err) => {
             console.error('예약 실패:', err);
@@ -315,7 +322,8 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
                             {selectedDate ? `${formatDateString(selectedDate, 'korean')}` : ''}
                         </div>
                         {showDatePicker ?
-                            <DayPicker animate mode='single' selected={selectedDate} onSelect={(date) => { handleTimeslots(date); }} />
+                            <Calender selectedDate={selectedDate} onSelectDate={setSelectedDate} // CustomDayPicker 내부에서 selectedDate를 업데이트할 함수 전달
+                                        handleTimeslots={handleTimeslots}  />   // 시간을 가져오는 함수 전달
                             :
                             <div>
                                 <div className="grid grid-cols-2 gap-2 mb-4">
@@ -326,7 +334,7 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
                                     {timeFilter === 'AM' && renderTimeButtons(amTimes)}
                                     {timeFilter === 'PM' && renderTimeButtons(pmTimes)}
                                 </div>
-                                <button className='w-full py-3 m-2 bg-[#4FA969] text-white' onClick={()=>{}}>다음단계</button>
+                                <button className='w-full py-3 m-2 bg-[#4FA969] text-white' onClick={()=>{handleReservationInfo()}}>다음단계</button>
                             </div>
                         }
                     </div>

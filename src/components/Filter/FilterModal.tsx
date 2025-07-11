@@ -11,11 +11,25 @@ import { IoHandLeftSharp } from "react-icons/io5";
 interface filterProps{
     isOpen: boolean;
     onClose: () => void;
-    onApplyFilters: (filters: any) => void; // 부모로 필터데이터 전달할 콜백함수
+    onApplyFilters: (filters: any, msg?: string) => void; // 부모로 필터데이터 전달할 콜백함수
     initialFilters?: any; // 초기 필터값
 }
 
 export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}: filterProps) {
+    // 충전사
+    const chargingComp: {value: string}[] = [
+        {value: "채비"}, {value: "레드이엔지"},
+        {value: "스타코프"}, {value: "씨어스"},
+        {value: "에버온"}, {value: "이지차저"},
+        {value: "이카플러그"}, {value: "제주전기자동차서비스"},
+        {value: "GS차지비"}, {value: "차지인"},
+        {value: "클린일렉스"}, {value: "타디스테크놀로지"},
+        {value: "파워큐브"}, {value: "플러그링크"},
+        {value: "한국전력"}, {value: "환경부"},
+        {value: "휴맥스이브이"}, {value: "기타"}
+    ]
+
+    
     const [canUse, setCanUse] = useState<boolean>(initialFilters.canUse);                // 사용가능
     const [parkingFree, setParkingFree] = useState<boolean>(initialFilters.parkingFree);   // 무료주차
     const [limitYn, setLimitYn] = useState<boolean>(initialFilters.limitYn);              // 개방
@@ -23,8 +37,11 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     const [selectedSpeedMin, setSelectedSpeedMin] = useState<number>(initialFilters.outputMin);
     const [selectedSpeedMax, setSelectedSpeedMax] = useState<number>(initialFilters.outputMax);
     const [selectedChargerTypes, setSelectedChargerTypes] = useState<string[]>(initialFilters.chargerTypes); // 커넥터타입 선택상태
-    const [selectedChargerComps, setSelectedChargerComps] = useState<string[]>(initialFilters.chargerComps); // 충전사 선택상태
-    // slider의 min/max값
+    const [selectedChargerComps, setSelectedChargerComps] = useState<string[]>(()=>{
+                                                                                if(!initialFilters.chargerComps || initialFilters.chargerComps.length === 0)
+                                                                                    return chargingComp.map(comp => comp.value);
+                                                                                return initialFilters.Comps;    
+                                                                                }); // 충전사 선택상태
     
     const [activeTab, setActiveTab] = useState<string>('속성');                     // 탭메뉴 선택상태(기본값 '속성')
     const [resultNum, setResultNum] = useState<number>();
@@ -63,18 +80,9 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         {value: 30000}, {value: 0} //전국
     ]
 
-    // 충전사
-    const chargingComp: {value: string}[] = [
-        {value: "채비"}, {value: "레드이엔지"},
-        {value: "스타코프"}, {value: "씨어스"},
-        {value: "에버온"}, {value: "이지차저"},
-        {value: "이카플러그"}, {value: "제주전기자동차서비스"},
-        {value: "GS차지비"}, {value: "차지인"},
-        {value: "클린일렉스"}, {value: "타디스테크놀로지"},
-        {value: "파워큐브"}, {value: "플러그링크"},
-        {value: "한국전력"}, {value: "환경부"},
-        {value: "휴맥스이브이"}, {value: "기타"}
-    ]
+    
+    // 전체선택 여부 판단
+    const isAllSelected = chargingComp.length === selectedChargerComps.length;   
 
     // 커넥터 타입
     const connectorTypes = [
@@ -140,6 +148,15 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         );
     }
 
+    // 충전사 전체선택/취소 버튼
+    const handleCompAll = () => {
+        if(isAllSelected) {    // 전체선택됐을 때 - 전체취소
+            setSelectedChargerComps([]);
+        } else {
+            setSelectedChargerComps(chargingComp.map(comp => comp.value));
+        }
+    }
+
     // 충전사 체크박스 핸들러
     const handleChargerComp = (event:  React.ChangeEvent<HTMLInputElement>)=>{
         const {value, checked} = event.target;
@@ -169,6 +186,17 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
     //     }
     // },[])
     
+    // '초기화' 버튼 클릭시 필터 초기화
+    const handleResetButton = () => {
+        setCanUse(false);
+        setParkingFree(false);
+        setLimitYn(false);
+        setSelectedRange(2000);
+        setSelectedSpeedMin(0);
+        setSelectedSpeedMax(300);
+        setSelectedChargerTypes([]);
+        setSelectedChargerComps(chargingComp.map(comp => comp.value));
+    }
 
     // '결과보기'버튼 클릭시 필터데이터를 부모로 전달
     const handleResultButton = () => {
@@ -182,8 +210,15 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
             chargerTypes: selectedChargerTypes,
             chargerComps: selectedChargerComps,
         }; 
-        onApplyFilters(filters);
-        onClose();
+
+        if (selectedChargerComps.length === 0) {
+            // 빈 배열일 경우, 필터 데이터와 함께 토스트 메시지를 전달합니다.
+            onApplyFilters(filters, '운영기관이 선택되지 않아 전체로 검색합니다.');
+        } else {
+            // 그 외의 경우, 필터 데이터만 전달합니다.
+            onApplyFilters(filters);
+        }
+        // onClose();
     }
 
     if(!isOpen) return null;
@@ -193,7 +228,7 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
         {/* 모달본체 */}
         <div className="bg-white rounded w-full max-w-xl p-6 relative flex flex-col h-[80vh]">
             {/* 헤더 */}
-            <button className="absolute top-4 right-4 text-2xl" onClick={onClose}>
+            <button className="absolute top-4 right-4 p-1 text-2xl cursor-pointer" onClick={onClose}>
                 &times;
             </button>
             <h2 className="mb-4 font-bold">필터</h2>
@@ -258,7 +293,10 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                 </div>
                 {/* 충전사 설정 */}
                 <div ref={chargerCompSectionRef} className="mb-8">
-                    <h4 className="mb-2" style={{color:'#666'}}>운영기관</h4>
+                    <div className="flex justify-between">
+                        <h4 className="mb-2" style={{color:'#666'}}>운영기관</h4>
+                        <button onClick={()=>handleCompAll()}>{isAllSelected ? '전체 취소' : '전체 선택'}</button>
+                    </div>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4 mb-4"> 
                         {chargingComp.map((item, idx) => (
                             <label key={`${idx}-${item.value}`} className="flex items-center space-x-2 cursor-pointer">
@@ -272,8 +310,9 @@ export default function Filter({isOpen, onClose, onApplyFilters, initialFilters}
                     </div>
                 </div>
             </div> 
-            <div className="pt-4 border-t sticky bottom-0 bg-white z-10" style={{borderColor:'#f2f2f2'}}> {/* mt-auto와 sticky, z-10 추가 */}
-                <button className="w-full bg-[#4FA969] text-white rounded py-3 mt-3" onClick={()=>handleResultButton()}>결과보기</button>
+            <div className="pt-4 border-t sticky bottom-0 bg-white z-10 flex gap-3" style={{borderColor:'#f2f2f2'}}> {/* mt-auto와 sticky, z-10 추가 */}
+                <button className="w-full flex-1/3 bg-[#f2f2f2] text-[#666] rounded py-3 mt-3 cursor-pointer" onClick={()=>handleResetButton()}>초기화</button>
+                <button className="w-full flex-2/3 bg-[#4FA969] text-white rounded py-3 mt-3 cursor-pointer" onClick={()=>handleResultButton()}>n개의 결과보기</button>
             </div>
         </div>
     </div>

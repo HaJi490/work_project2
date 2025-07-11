@@ -20,20 +20,16 @@ type MarkerType = {
     availableCnt: number;
 };
 
-// 기본 마커 이미지
-// const DEFAULT_MARKER_IMAGE_URL = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
-// // 선택된 마커 이미지
-// const SELECTED_MARKER_IMAGE_URL = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png';
-// // 마커 이미지 크기
-// const MARKER_IMAGE_SIZE = new window.kakao.maps.Size(24, 35);
 
 export default function ChargingMap({ markers, myPos, radius, selectedStationId, posHere, mapCenter }: ChargingMapProps) {
     const [isMapReady, setIsMapReady] = useState(false);    // 지도준비상태 추적
-    const mapRef = useRef<any>(null);       // map객체 저장용
-    const mapInstance = useRef<any>(null);  // 지도 인스턴스 저장
+    const mapRef = useRef<any>(null);                       // map객체 저장용
+    const mapInstance = useRef<any>(null);                  // 지도 인스턴스 저장
     // key: marker.id, value: kakao.maps.Marker 인스턴스
     const markerInstances = useRef<Map<string, any>>(new Map());
-    const circleRef = useRef<any | null>(null);   //반경ref
+    const circleRef = useRef<any | null>(null);             //반경ref
+    const [zIndex, setZIndex] = useState<number>(1);        // 선택된마커 앞으로
+    
 
     // 1. 지도 초기화(컴포넌트 마운트시)
     useEffect(() => {
@@ -101,7 +97,7 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
     }
     }, [myPos, radius, isMapReady]);
 
-    // 3. markers 또는 selectedStationId 변경 시 마커 업데이트
+    // 4. markers 또는 selectedStationId 변경 시 마커 업데이트
     useEffect(() => {
         console.log('[🎯 마커 그리기 시작]');
         console.log('[🧩 마커 데이터]', markers);
@@ -118,7 +114,7 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
         console.log('[🔁 현재 마커]', [...currentMarkerIds]);
         console.log('[🔁 새 마커]', [...newMarkerIds]);
 
-        // 3-1. 사라진 마커 제거
+        // 4-1. 사라진 마커 제거
         currentMarkerIds.forEach(id => {
             if(!newMarkerIds.has(id)){
                 const {marker, customOverlay} = markerInstances.current.get(id);
@@ -128,19 +124,19 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
             }
         })
 
-        // 3-2. 새로운 마커 추가 / 기존마커 업데이트
+        // 4-2. 새로운 마커 추가 / 기존마커 업데이트
         markers.forEach(markerDt => {
             // console.log(`[📌 ${markerDt.id}] 위도: ${markerDt.lat}, 경도: ${markerDt.lng}`);
             const existingMarker = markerInstances.current.get(markerDt.id);
             const isSelected = markerDt.id === selectedStationId;
             const isAvailable = markerDt.availableCnt > 0;
 
-            // 이미지 생성
+            // - 이미지 생성
             let imageUrl: string;
             let imageSize: any;
             if(isSelected){
-                imageUrl = '/selectedmarker.jpg';
-                imageSize = new window.kakao.maps.Size(32, 32);
+                imageUrl = '/available.png';
+                imageSize = new window.kakao.maps.Size(50, 50);
             } else if (isAvailable){
                 imageUrl = '/available.png';
                 imageSize = new window.kakao.maps.Size(32, 32);
@@ -155,45 +151,82 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
                 imageSize
             );
 
-            // 커스텀오버레이 내용
-            // let overlayContent = '';
-            let overlayClass = style.customOverlayDefault; //기본 스타일 클래스
-            // console.log(overlayClass);
-            // if(isAvailable){
-            //     overlayContent=`<div className="${overlayClass}">${markerDt.availableCnt}</div>`
-            // }
-            // 1. DOM 요소 직접 생성
-            const div = document.createElement('div');
-            div.className = overlayClass;
-            div.textContent = markerDt.availableCnt.toString();
+            // - 커스텀오버레이 내용
+            let overlayContentDiv : HTMLElement;
 
+            if(isSelected){
+                // 선택된 말풍선
+                const selectedDiv = document.createElement('div');
+                selectedDiv.className = style.customOverlaySelected;
+
+                const title = document.createElement('div');
+                title.className = style.overlayTitle;
+                title.innerText = markerDt.name;
+
+                const count = document.createElement('div');
+                count.className = style.overlayCount;
+                count.innerText = `${markerDt.availableCnt}개 가능`;
+
+                const btnWrap = document.createElement('div');
+                btnWrap.className = style.overlayButtons;
+
+                // const startBtn = document.createElement('button');
+                // startBtn.innerText = '출발';
+                // startBtn.onclick = () => handleStart(markerDt);
+
+                // const endBtn = document.createElement('button');
+                // endBtn.innerText = '도착';
+                // endBtn.onclick = () => handleEnd(markerDt);
+
+                // btnWrap.append(startBtn, endBtn);
+                selectedDiv.append(title, count, btnWrap);
+                overlayContentDiv = selectedDiv;
+            } else{
+                // 기본(DOM 요소 직접 생성)
+                const basicDiv = document.createElement('div');
+                basicDiv.className = style.customOverlayDefault; //기본 스타일 클래스
+                basicDiv.textContent = markerDt.availableCnt.toString();
+                overlayContentDiv = basicDiv;
+            }
+                
+
+
+            const zIndexSetting = isSelected ? 999 : 1;
 
             if(existingMarker){
                 // 이미 존재하는 마커는 업데이트(보통 이미지)
                 const { marker, customOverlay } = existingMarker;
+                const markerStatus = isSelected ? 'selected' : isAvailable ? 'available' : 'unavailable';
                 // 마커 이미지 변경이 필요한 경우만 업데이트
-                // if (marker.getImage().getImageSrc() !== markerImage.getImageSrc()) {
-                //     marker.setImage(markerImage);
+                if ((marker as any).status !== markerStatus) {
+                    marker.setImage(markerImg);
+                    (marker as any).status = markerStatus;
+                }
+                setZIndex(zIndexSetting);
+                // if (marker.getImage().getImageSrc() !== markerImg.getImageSrc()) {
+                //     marker.setImage(markerImg);
                 // }
 
                 // 커스텀 오버레이 추가/제거
                 if(isAvailable){
                     if(customOverlay){
                         // 기존에 있고 내용이 바뀌면 업데이트
-                        if(customOverlay.getContent() !== div){
-                            customOverlay.setContent(div);
+                        if(customOverlay.getContent() !== overlayContentDiv){
+                            customOverlay.setContent(overlayContentDiv);
                         }
                     } else {
                         // 새로운 커스텀 오버레이
                         const newOverlay = new window.kakao.maps.CustomOverlay({
                             map: mapInstance.current,
                             position: marker.getPosition(), // 마커와 동일한 위치
-                            content: div,
-                            yAnchor: 2.2, // 마커 이미지에 따라 조정
+                            content: overlayContentDiv,
+                            yAnchor: isSelected? 3.8 :1.35,      // 0-1(1에 가까울수록 위)
                             clickable: true, // 클릭 가능 여부 (필요에 따라)
+                            zIndex: zIndex,
                         });
                         existingMarker.customOverlay = newOverlay; // Map에 저장
                     }
+                    
                 } else {
                     // availableCnt가 0이 되었는데 오버레이가 있다면 제거
                     if (customOverlay) {
@@ -205,11 +238,13 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
             } else {
                 // 새로운 마커 생성
                 const markerPosition = new window.kakao.maps.LatLng(markerDt.lat, markerDt.lng);    //?
+                
                 const newKakaoMarker = new window.kakao.maps.Marker({
                     map: mapInstance.current,
                     position: markerPosition,
                     titile: markerDt.name,
                     image: markerImg,
+                    zIndex: zIndex,
                 });
 
                 let newCustomOverlay = undefined;
@@ -217,9 +252,10 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
                     newCustomOverlay = new window.kakao.maps.CustomOverlay({
                         map: mapInstance.current,
                         position: markerPosition,
-                        content: div,
-                        yAnchor: 2.2, // 마커 이미지에 따라 조정 (위로 올리기)
+                        content: overlayContentDiv,
+                        yAnchor: isSelected? 3.8 :1.35, // 0-1(1에 가까울수록 위)
                         clickable: true,
+                        zIndex: zIndex,
                     });
                 }
                 // Map에 마커 및 오버레이 인스턴스 저장

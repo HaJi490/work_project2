@@ -43,9 +43,9 @@ export default function page() {
   }
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
         <span className="text-[12px] text-[#afafaf] flex"><IoMdHome />&nbsp;{'>'} 로그인</span>
-        <main className='w-screen flex-grow flex flex-col justify-center items-center bg-white px-4 pb-[50px]'>
+        <main className='w-screen flex-grow flex flex-col justify-center items-center bg-white px-4 pb-[100px]'>
           {/* <span className="text-red-500">OR에 border 안생김(크기조정하면 있긴함)</span> */}
           <form className="w-5/10 max-w-[400px] sm:w-96 px-6" onSubmit={e => {e.preventDefault(); login();}}>
             <h2 className='text-center font-medium text-[28px] tracking-wide mb-6'>로그인</h2>
@@ -79,6 +79,6 @@ export default function page() {
           </div>
               
         </main>
-      </>
+      </div>
   )
 }

@@ -9,10 +9,10 @@ import nmToid from '../db/busi_id.json'
 import respDummies from '../db/ChargingStationResponseDto.json'
 
 import style from './home.module.css';
-import ChargingMap from "../components/ChargingMap copy";
-import Nav from "../components/Nav/Nav";
+import ChargingMap from "../components/ChargingMap/ChargingMap copy";
 import FilterModal from "../components/Filter/FilterModal"
 import StationDetailPanal from "@/components/StationDetailPanal.module/StationDetailPanal";
+import Toast from "@/components/Toast/Toast";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { TfiSearch } from "react-icons/tfi";
 
@@ -41,6 +41,7 @@ interface Filters {
 export default function Home() {
   const[list, setList] = useState<ChargingStationResponseDto[]>([]);  // resp
   const [isFilterOpen, setIsFilterOpen] = useState(false);            // 필터 onoff
+  const [toastMessage, setToastMessage] = useState('');               // 필터에서 닫힐때 보낼 메시지(운영기관 선택안했을때)
   const [currentFilter, setCurrentFilter] = useState<Filters>({       // req에 담을 정보
       lat: 35.2325,
       lon: 129.0851,
@@ -57,7 +58,7 @@ export default function Home() {
   const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);         // map에 쓰일 현재위치_ 반경표시
   const [mapCenter, setMapCenter] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]); // map의 중심
   const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null >(null);     // 선택된 충전소
-  const closeDetailRef = useRef<HTMLButtonElement>(null);  // 필터누르면 detailpenal 꺼지게
+  const closeDetailRef = useRef<HTMLButtonElement | null>(null);  // 필터누르면 detailpenal 꺼지게
   
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
   // const [places, setPlaces] = useState<Place[]>([]);               // 검색어에 따른 리스트
@@ -224,10 +225,16 @@ export default function Home() {
   //   setPlaces([]);  // 검색 결과 목록 숨김
   // }
 
-  // 6. 필터 완료버튼 클릭했을 시
-  const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
+  // 6. 필터 완료버튼 클릭했을 시_ 필터적용, 모달닫기, 토스트표시
+  const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >, msg?: string) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
+    // 6-1. 토스트 표시
+    if (msg) {
+      setToastMessage(msg);
+    }
+    // 6-2. 필터모달 닫기
     setIsFilterOpen(false); //모달닫기
 
+    // 6-3. 필터 적용
     // currentFilter에 newFilter씌운 객체
     const nextFilter = {
       ...currentFilter,
@@ -285,6 +292,7 @@ export default function Home() {
                           onClose={()=>setIsFilterOpen(false)}
                           onApplyFilters={handleApplyFilters} // 필터
                           initialFilters={currentFilter} />
+              <Toast message={toastMessage} setMessage={setToastMessage} />
           </div>
           {/* 검색 */}
           <div className="pb-4 border-b border-[#f2f2f2]">

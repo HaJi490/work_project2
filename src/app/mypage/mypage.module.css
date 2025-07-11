@@ -1,0 +1,12 @@
+.body{
+    
+}
+
+.mypageContainer{
+    width: 70%;
+    max-width: 1100px;
+    display: flex;
+    margin-top: 5rem;
+    /* w-7/10 max-w-[1100px] flex mt-15 */
+    background-color: #F7F9FA; /* or #EEF1F6 */
+}

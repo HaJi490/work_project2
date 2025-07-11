@@ -30,22 +30,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <header>
+      
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <header>
         <Script
           type="text/javascript"
-          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_JSKEY}&autoload=false&libraries=services`}
+          src={`https://dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_JSKEY}&autoload=false&libraries=services,clusterer`}
           strategy= "beforeInteractive"  // 리액트가 하이드레이트 되기 전에 스크립트 로드
         />
         <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
-         <Script
+        <Script
         id="daum-postcode-script"
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
         strategy="lazyOnload"
-      />
+        />
       </header>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="w-full h-full items-center justify-items-center min-h-screen   font-[family-name:var(--font-geist-sans)]">
+        <div className="w-full h-full items-center justify-items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
           <Nav/>
           {children}
         </div>
