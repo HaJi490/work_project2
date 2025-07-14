@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState, useRef, useCallback } from "react";
-import {isEqual} from 'lodash' // lodash 라이브러리의 isEqual 함수를 사용하면 객체 비교가 편리합니다.
+import { isEqual } from 'lodash' // lodash 라이브러리의 isEqual 함수를 사용하면 객체 비교가 편리합니다.
 
 import { ChargingStationRequestDto, ChargingStationResponseDto, MapQueryDto, CoordinatesDto } from '@/types/dto';
 import nmToid from '../db/busi_id.json'
@@ -39,27 +39,27 @@ interface Filters {
 }
 
 export default function Home() {
-  const[list, setList] = useState<ChargingStationResponseDto[]>([]);  // resp
+  const [list, setList] = useState<ChargingStationResponseDto[]>([]);  // resp
   const [isFilterOpen, setIsFilterOpen] = useState(false);            // 필터 onoff
   const [toastMessage, setToastMessage] = useState('');               // 필터에서 닫힐때 보낼 메시지(운영기관 선택안했을때)
   const [currentFilter, setCurrentFilter] = useState<Filters>({       // req에 담을 정보
-      lat: 35.2325,
-      lon: 129.0851,
-      radius: 2000,
-      canUse: false,
-      parkingFree: false,
-      limitYn: false,
-      chargerTypes: [],
-      chargerComps: [],
-      outputMin: 0,
-      outputMax: 300, 
-      keyWord: '',
-  }); 
-  const [myPos, setMyPos] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]);         // map에 쓰일 현재위치_ 반경표시
-  const [mapCenter, setMapCenter] = useState<[number, number]>([currentFilter.lat, currentFilter.lon]); // map의 중심
-  const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null >(null);     // 선택된 충전소
+    lat: 0,
+    lon: 0,
+    radius: 2000,
+    canUse: false,
+    parkingFree: false,
+    limitYn: false,
+    chargerTypes: [],
+    chargerComps: [],
+    outputMin: 0,
+    outputMax: 300,
+    keyWord: '',
+  });
+  const [myPos, setMyPos] = useState<[number, number] | null>(null);         // map에 쓰일 현재위치_ 반경표시
+  const [mapCenter, setMapCenter] = useState<[number, number] | null>(null); // map의 중심
+  const [selectedStation, setSelectedStation] = useState<ChargingStationResponseDto | null>(null);     // 선택된 충전소
   const closeDetailRef = useRef<HTMLButtonElement | null>(null);  // 필터누르면 detailpenal 꺼지게
-  
+
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
   // const [places, setPlaces] = useState<Place[]>([]);               // 검색어에 따른 리스트
   const [kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
@@ -69,18 +69,18 @@ export default function Home() {
   // useCallback을 사용하여 myPos나 currentFilter가 변경될 때만 함수가 재생성되도록 함
   const fetchStations = useCallback(async (filtersToApply: Filters) => {
 
-    function CompNmToIds(selectedNm: string[]):string[]{
+    function CompNmToIds(selectedNm: string[]): string[] {
       return nmToid.filter(company => selectedNm.includes(company.busi_nm))
-                  .map(company => company.busi_id);
+        .map(company => company.busi_id);
     }
     // API 요청 DTO에 맞게 필터 객체 구성
     const requestBody: ChargingStationRequestDto = {
-      "coorDinatesDto" : {
+      "coorDinatesDto": {
         lat: filtersToApply.lat,
         lon: filtersToApply.lon,
         radius: filtersToApply.radius,
       },
-      "mapQueryDto":{
+      "mapQueryDto": {
         useMap: true,
         canUse: filtersToApply.canUse,
         parkingFree: filtersToApply.parkingFree,
@@ -108,43 +108,44 @@ export default function Home() {
       console.error("fetchStations error: ", err);
       setList([]);
     }
-  }, []); 
+  }, []);
 
 
   // 2. 현재위치 가져오기
-  useEffect(()=>{
-      navigator.geolocation.getCurrentPosition((position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        // 초기 currentFilter에 위치 정보 업데이트
-        setCurrentFilter((prev) => ({
-          ...prev,
-          lat,  // 변수이름 같으면 생략가능
-          lon: lng,
-          
-        }));
-        setMyPos([lat, lng]);
-        setMapCenter([lat, lng]);
-      },
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      // 초기 currentFilter에 위치 정보 업데이트
+      // setCurrentFilter((prev) => ({
+      //   ...prev,
+      //   lat,  // 변수이름 같으면 생략가능
+      //   lon: lng,
+
+      // }));
+      setMyPos([lat, lng]);
+      setMapCenter([lat, lng]);
+    },
       (error) => {
-          console.error("위치 정보를 가져오지 못했습니다.", error);
-          // 위치 못가져오면 기본값 부산대역
-          setCurrentFilter((prev) => ({
-          ...prev,
-          lat: 35.2325,  
-          lon: 129.0851,
-        }));
-        setMyPos([35.1795, 129.0756]);
-        setMapCenter([35.1795, 129.0756]);
+        console.error("위치 정보를 가져오지 못했습니다.", error);
+        // 위치 못가져오면 기본값 부산대역
+        const defaultPos: [number, number] = [35.1795, 129.0756]
+        //   setCurrentFilter((prev) => ({
+        //   ...prev,
+        //   lat: 35.2325,  
+        //   lon: 129.0851,
+        // }));
+        setMyPos(defaultPos);
+        setMapCenter(defaultPos);
       });
-  },[]);
+  }, []);
 
   // 3. 카카오지도 api 로드확인 및 콜백 등록
-  useEffect(()=>{
+  useEffect(() => {
     //window객체 존재 확인
-    if(window.kakao && window.kakao.maps){
+    if (window.kakao && window.kakao.maps) {
       window.kakao.maps.load(() => {
-        if(window.kakao.maps.services){
+        if (window.kakao.maps.services) {
           console.log('KakaoMap API 로드 성공');
           setKakaoMapLoaded(true);
         } else {
@@ -156,14 +157,19 @@ export default function Home() {
       // 일정시간 후 다시 시도하거나 사용자에게 알림 ---------------------  FIXME
       // layout.tsx에 strategy옵션 확인 //gemini '오류는...'
     }
-  },[])
+  }, [])
 
   // 4. currentFilter 변경 시 충전소 정보 다시 불러오기
-  useEffect(()=>{
-    if (kakaoMapLoaded && currentFilter.lat && currentFilter.lon) {
-        fetchStations(currentFilter);
+  useEffect(() => {
+    if (kakaoMapLoaded && myPos) {
+      const filtersToRequest = {
+        ...currentFilter,
+        lat: myPos[0], // currentFilter의 lat/lon 대신, 확정된 myPos 값을 사용
+        lon: myPos[1],
+      };
+      fetchStations(filtersToRequest);
     }
-  },[currentFilter, kakaoMapLoaded, fetchStations])
+  }, [currentFilter, myPos, kakaoMapLoaded, fetchStations])
 
   // 받은 list markers에 넣기
   const markers = list.map((item) => ({ // 🍕 respDummies 로 변경
@@ -176,7 +182,7 @@ export default function Home() {
   ))
 
   // 5. 장소 검색
-  const searchPlaces = () =>{
+  const searchPlaces = () => {
     const keyword = searchRef.current?.value;
 
     const nextFilter = {
@@ -185,48 +191,10 @@ export default function Home() {
     }
     console.log(nextFilter);
     setCurrentFilter(nextFilter);
-    
-
-    // 카카오API가 로드되었는지 확인하는 kakaoMapLoaded
-    // if(!kakaoMapLoaded){
-    //   alert('지도를 로드하는 중입니다. 잠시후 다시 시도해주세요.');
-    //   return;
-    // }
-    // if(!keyword){
-    //   alert('검색어를 입력하세요')
-    //   return;
-    // }
-
-    // const ps = new window.kakao.maps.service.Places();
-    // ps.keywordSearch(keyword, (data: Place[], status: any, pagination: any) => {
-    //   // 키워드 리스트 추출
-    //   if(status === window.kakao.maps.service.Status.OK ){
-    //     setPlaces(data);
-    //   } else if(status === window.kakao.maps.service.Status.ZERO_RESULT){
-    //     alert('검색 결과가 없습니다.');
-    //     setPlaces([]);
-    //   } else if(status === window.kakao.maps.service.Status.ERROR){
-    //     alert('검색 중 오류가 발생했습니다.');
-    //     setPlaces([]);
-    //   }
-    // });
-  }
-
-  // const handlePlaceSelect = (place: Place) => {
-  //   // 선택된 장소 경도, 위도 추출
-  //   const lat = parseFloat(place.y); // 위도
-  //   const lng = parseFloat(place.x); // 경도
-  //   setCurrentFilter((prev) => ({
-  //     ...prev,
-  //     lat,  
-  //     lon: lng,
-  //   }));
-  //   setMyPos([lat, lng]);
-  //   setPlaces([]);  // 검색 결과 목록 숨김
-  // }
+  };
 
   // 6. 필터 완료버튼 클릭했을 시_ 필터적용, 모달닫기, 토스트표시
-  const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >, msg?: string) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
+  const handleApplyFilters = (newFilters: Omit<Filters, 'lat' | 'lon'>, msg?: string) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
     // 6-1. 토스트 표시
     if (msg) {
       setToastMessage(msg);
@@ -243,7 +211,7 @@ export default function Home() {
 
     console.log(nextFilter);
     // current와 next가 실제로 다른지 비교
-    if(!isEqual(currentFilter, newFilters)){
+    if (!isEqual(currentFilter, newFilters)) {
       setCurrentFilter(nextFilter);
     }
   }
@@ -251,7 +219,7 @@ export default function Home() {
   // 7. 리스트 아이템 클릭시 지도 이동 및 상세정보 표시
   const handleStaionClick = (station: ChargingStationResponseDto) => {
     setMapCenter([station.lat, station.lng]);
-    console.log('선택한 충전소 정보:',station);
+    console.log('선택한 충전소 정보:', station);
     setSelectedStation(station);
   }
 
@@ -260,70 +228,58 @@ export default function Home() {
     setSelectedStation(null);
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     setSelectedStation(null);
   }, [closeDetailRef])
 
   // 9. 지도 현위치에서 검색
-  const handleSearchHere = (center: any) =>{
+  const handleSearchHere = (center: any) => {
     const lat = center.getLat();
     const lng = center.getLng();
     console.log('지도중심 좌표: ', lat, lng);
     setMyPos([lat, lng]);
     setMapCenter([lat, lng]);
-    
-    setCurrentFilter(prev => ({
-      ...prev,
-      lat: lat,
-      lon: lng,
-    }));
+
+    // setCurrentFilter(prev => ({
+    //   ...prev,
+    //   lat: lat,
+    //   lon: lng,
+    // }));
   }
 
 
-  return (
+    return (
       <div className={style.mainContainer}>
         {/* 왼쪽 */}
         <div className="w-100 h-full flex flex-col p-10 bg-white z-10 shadow-md">
           <div className='flex flex-row justify-between'>
-            <h3 className=" font-semibold mb-4" style={{color:"#4FA969"}}> 충전소 찾기</h3>
-            <button ref={closeDetailRef} onClick={()=>setIsFilterOpen(true)}
-              className='text-[24px] cursor-pointer' style={{color:'#666'}}><HiOutlineAdjustmentsHorizontal/></button>
-              <FilterModal isOpen={isFilterOpen} 
-                          onClose={()=>setIsFilterOpen(false)}
-                          onApplyFilters={handleApplyFilters} // 필터
-                          initialFilters={currentFilter} />
-              <Toast message={toastMessage} setMessage={setToastMessage} />
+            <h3 className=" font-semibold mb-4" style={{ color: "#4FA969" }}> 충전소 찾기</h3>
+            <button ref={closeDetailRef} onClick={() => setIsFilterOpen(true)}
+              className='text-[24px] cursor-pointer' style={{ color: '#666' }}><HiOutlineAdjustmentsHorizontal /></button>
+            <FilterModal isOpen={isFilterOpen}
+              onClose={() => setIsFilterOpen(false)}
+              onApplyFilters={handleApplyFilters} // 필터
+              initialFilters={currentFilter} />
+            <Toast message={toastMessage} setMessage={setToastMessage} />
           </div>
           {/* 검색 */}
           <div className="pb-4 border-b border-[#f2f2f2]">
             <div className={style.searchInput}>
               <input type="text" ref={searchRef} placeholder="충전소를 검색하세요" className="outline-none" />
-              <button className="pr-5 px-2 py-1 pt-1 cursor-pointer" onClick={()=>{searchPlaces()}}><TfiSearch/></button>
+              <button className="pr-5 px-2 py-1 pt-1 cursor-pointer" onClick={() => { searchPlaces() }}><TfiSearch /></button>
             </div>
-            {/* <button onClick={()=>searchPlaces()} disabled={!kakaoMapLoaded}>검색</button>
-            {places.length > 0 ? (
-              <ul>
-                {places.map((place) => (
-                  <li className={style.searchResult} key={place.id} onClick={() => handlePlaceSelect(place)} >
-                    <strong>{place['place_name']}</strong>
-                    <p>{place['address_name']}</p>
-                  </li>
-                ))}
-              </ul>
-                ) : (
-                  <p>검색결과가 없습니다.</p>
-            )} */}
+
           </div>
           {/* 충전소 목록 */}
           {/* <h4>충전소 목록</h4> */}
           <ul className="scrollContent">
             {list.map((item) => ( // 🍕 respDummies 로 변경
-              <li key={item.statId} className={style.listSection} onClick={()=>handleStaionClick(item)}>
-                <h4 className='text-[15px]' style={{color:'#232323'}}>{item.statNm}</h4>
-                <p className='text-[12px]' style={{color:'#666'}}>{item.addr}</p>
+              <li key={item.statId} className={style.listSection} onClick={() => handleStaionClick(item)}>
+                <h4 className='text-[15px]' style={{ color: '#232323' }}>{item.statNm}</h4>
+                <p className='text-[12px]' style={{ color: '#666' }}>{item.addr}</p>
                 <div className='flex gap-3'>
-                  <p className='text-[12px]' style={{color:'#666'}}>
-                    {item.parkingFree ? '무료주차, ' : '유료주차, '} {item.limitYn ? '비개방, ': '개방, '} {item.chargeNum} / { item.totalChargeNum}</p>
+                  <p className='text-[12px]' style={{ color: '#666' }}>
+                    {item.parkingFree ? '무료주차, ' : '유료주차, '} {item.limitYn ? '비개방, ' : '개방, '} {item.chargeNum} / {item.totalChargeNum}</p>
                 </div>
               </li>
 
@@ -332,17 +288,28 @@ export default function Home() {
         </div>
         {/* 오른쪽 - 지도 */}
         <div className="flex-grow">
-          <ChargingMap  myPos ={myPos} radius={currentFilter.radius} posHere={handleSearchHere} mapCenter={mapCenter} //충전소마커, 현지도위치, 반경, 현지도위치콜백, 맵의중심(충전소선택, 현재위치 구분을위해서) 
-                        markers={markers} selectedStationId={selectedStation?.statId}/>
+          {myPos ? (
+            <ChargingMap myPos={myPos}
+              radius={currentFilter.radius} posHere={handleSearchHere}
+              mapCenter={mapCenter} //충전소마커, 현지도위치, 반경, 현지도위치콜백, 맵의중심(충전소선택, 현재위치 구분을위해서) 
+              markers={markers}
+              selectedStationId={selectedStation?.statId} />
+          ) : (
+            <div className="w-full h-full flex justify-center items-center">
+              <p>지도를 불러오는 중입니다...</p>
+            </div>
+          )
+          }
           {/* <div className="fixed h-full top-20 left-[calc(30%+2rem)] z-50"> */}
           {selectedStation && (
             <StationDetailPanal station={selectedStation}
-                                onClose={handleCloseDetailPanel} 
-                                closeDetailRef={closeDetailRef}/>  //outsideClickRefs={closeDetailRef}
+              onClose={handleCloseDetailPanel}
+              closeDetailRef={closeDetailRef} />  //outsideClickRefs={closeDetailRef}
           )}
 
           {/* </div> */}
         </div>
       </div>
-  );
-}
+    );
+  }
+

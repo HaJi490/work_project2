@@ -2,6 +2,9 @@
 
 import React, { useRef, useEffect, useState } from 'react'
 import axios from 'axios'
+import { useAtom } from 'jotai';
+import { accessTokenAtom } from '@/store/auth';
+
 import { ChargingStationResponseDto, ChargerInfoMap, ChargerInfoItem } from '@/types/dto'
 // import { DayPicker } from 'react-day-picker'
 // import "react-day-picker/style.css";
@@ -21,6 +24,8 @@ interface StationDetailPanalProps {
 type DateFormatTp = 'korean' | 'iso';
 
 export default function StationDetailPanal({ station, onClose, closeDetailRef }: StationDetailPanalProps) {
+    const [token] = useAtom(accessTokenAtom); // 토큰 가져오기
+
     const panelRef = useRef<HTMLDivElement>(null);                  // 전체 판넬닫기
     const reservRef = useRef<HTMLDivElement>(null);                 // 예약 판넬닫기
     const [showReserv, setShowReserv] = useState<boolean>(false);   // 예약창 뜨기
@@ -234,7 +239,7 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
 
         axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reserve/setSlots`, requestBody,
             {headers: {
-                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+                Authorization: token ? `Bearer ${token}` : ''
             }}
         )    //  FIXME 백주소
         .then((res) => {

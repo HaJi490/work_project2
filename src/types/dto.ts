@@ -113,5 +113,44 @@ export interface TimeInfo {
   enabled: boolean;
 }
 
+// 마이페이지 - 회원정보
+export interface User {
+  username: string;         // 사용자 아이디
+  nickname: string;         // 닉네임
+  password: string | null;  // 비밀번호 (null 허용)
+  phoneNumber: string;      // 전화번호
+  email: string;            // 이메일
+  sex: 'male' | 'female';   // 성별
+  address: string;          // 주소
+  enabled: boolean;         // 활성화 여부
+  createAt: string;         // 생성일시 (ISO 형식 문자열)
+};
+
+
+// 마이페이지 - 충전히스토리
+// 충전히스토리 타입 선언
+export interface ChargingHistoryItem  {
+  statNm: string;            // 충전소 이름
+  chgerId: string;           // 충전기 ID
+  chargeDate: string;        // 충전 날짜 (YYYY.MM.DD)
+  chargeSTime: string;       // 충전 시작 시간 (HH:mm)
+  chargeETime: string;       // 충전 완료 시간 (HH:mm)
+  chargeAmount: number;      // 충전량 (kWh)
+  chargeCost: number;        // 충전 금액
+  chargeDuration: number;    // 충전 시간 (분)
+  isReserved: boolean;       // 예약 여부
+  reservedSTime: string;     // 예약 시작 시간 (HH:mm)
+  reservedETime: string;     // 예약 완료 시간 (HH:mm)
+  chgerType: string;         // 충전기 종류
+  busiNm: string;            // 사업자명
+  // 결제수단, 충전기위치 등 추가 가능
+};
+
+export interface History {
+  monthlyChargeCount: number;           // 월 충전 횟수
+  monthlyChargeAmount: number;          // 월 충전량 (kWh)
+  monthlyChargeCost: number;            // 월 충전 금액
+  chargingHistory: ChargingHistoryItem[]; // 충전 내역 리스트
+};
 
 
