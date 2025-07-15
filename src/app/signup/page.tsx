@@ -213,11 +213,11 @@ export default function signup() {
             errorMessage += '비밀번호 확인이 일치하지 않습니다.\n';
         }
 
-        // 전화번호 검사 (간단한 길이 확인)
-        if (phone.replace(/-/g, '').length < 10) { // 하이픈 제거 후 최소 10자리
-            isValidForm = false;
-            errorMessage += '유효한 휴대폰 번호를 입력해주세요.\n';
-        }
+        // // 전화번호 검사 (간단한 길이 확인)
+        // if (phone.replace(/-/g, '').length < 10) { // 하이픈 제거 후 최소 10자리
+        //     isValidForm = false;
+        //     errorMessage += '유효한 휴대폰 번호를 입력해주세요.\n';
+        // }
 
         // 이메일 검사 (간단한 유효성)
         if (!email || !customDomain || !email.includes('@') && customDomain === '직접입력') { // @ 포함 여부는 email 상태에 직접 확인, customDomain이 직접입력이 아닌 경우만 유효성 검사

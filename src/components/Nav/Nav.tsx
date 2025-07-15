@@ -28,8 +28,8 @@ export default function Nav() {
 
   const handleLogout = () => {
     setToken(null);
-    alert("로그아웃 되었습니다.");
-    route.push('/login');
+    // alert("로그아웃 되었습니다.");
+    route.push('/login?toast=로그아웃 되었습니다.');
   };
 
   return (
@@ -46,7 +46,7 @@ export default function Nav() {
         <li>회사소개</li>
         <li>이용안내</li>
         <li onClick={()=>{route.push('/')}} className='cursor-pointer'>충전소 찾기</li>
-        <li>충전스케줄링</li>
+        <li onClick={()=>{route.push('/chg-schedule')}} className='cursor-pointer'>충전스케줄링</li>
       </ul>
       {/* 우측 버튼 */}
       <div className={style.authBox}>

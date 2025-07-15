@@ -11,7 +11,7 @@ import respDummies from '../db/ChargingStationResponseDto.json'
 import style from './home.module.css';
 import ChargingMap from "../components/ChargingMap/ChargingMap copy";
 import FilterModal from "../components/Filter/FilterModal"
-import StationDetailPanal from "@/components/StationDetailPanal.module/StationDetailPanal";
+import StationDetailPanal from "@/components/StationDetailPanal/StationDetailPanal";
 import Toast from "@/components/Toast/Toast";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { TfiSearch } from "react-icons/tfi";

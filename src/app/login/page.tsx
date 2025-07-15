@@ -1,23 +1,31 @@
 'use client'
 
-import Nav from "@/components/Nav/Nav"
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from 'axios';
 import Image from "next/image"
 import { useAtom } from "jotai";
 
+import Toast from "@/components/Toast/Toast";
 import { IoMdHome } from "react-icons/io";
 import Link from "next/link";
 import { accessTokenAtom } from "@/store/auth";
 
 export default function page() {
   const [, setToken] = useAtom(accessTokenAtom);
+  const [toastMsg, setToastMsg] = useState<string>('');
+
   const [id, setId] = useState('');
   const [pwd, setPwd] = useState('');
   
   const route = useRouter();
+
+  // 회원탈퇴 후
+  useEffect(()=>{
+    const searchParams = new URLSearchParams(window.location.search);
+    const toast = searchParams.get('toast');
+    if (toast) setToastMsg(toast);
+  },[])
 
   const login = async(e: React.FormEvent) =>{
     e.preventDefault();
@@ -50,6 +58,7 @@ export default function page() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Toast message={toastMsg} setMessage={setToastMsg}/>
         <span className="text-[12px] text-[#afafaf] flex"><IoMdHome />&nbsp;{'>'} 로그인</span>
         <main className='w-screen flex-grow flex flex-col justify-center items-center bg-white px-4 pb-[100px]'>
           {/* <span className="text-red-500">OR에 border 안생김(크기조정하면 있긴함)</span> */}
@@ -66,7 +75,7 @@ export default function page() {
                 <input type='password' value={pwd} onChange={e=> setPwd(e.target.value.trim())} required  // 사용자가 입력안하면 브라우저가 경고
                       className='w-full px-4 py-3 border border-[#afafaf] focus:ouline-none focus:outline-[#4FA969]'/>
               </div>
-                <button type='submit' className='w-full px-4 py-3 bg-[#4FA969] text-white text-center font-semibold mb-4'>로그인</button>
+                <button type='submit' className='w-full px-4 py-3 bg-[#4FA969] text-white text-center font-semibold mb-4 cursor-pointer'>로그인</button>
             {/* </div> */}
           </form>
           <div className='text-[#666] text-[15px] flex gap-3'>

@@ -150,7 +150,7 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
             try {
                 const res = await axios.post<TimeInfo[]>(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/time/timeslots`, requestBody);
 
-                setGetTimeslots(res.data);  // 왜 로그인 안해도되지?
+                setGetTimeslots(res.data);  
                 console.log(res.data);
             } catch (error) {
                 console.error('handleTimeslots error:', error)
@@ -237,11 +237,17 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
 
         console.log('예약요청 데이터: ', requestBody );
 
+        if (!token) {
+            console.warn('토큰 없음');
+            alert('로그인이 필요한 서비스입니다.')
+            return;
+        }
+
         axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reserve/setSlots`, requestBody,
             {headers: {
-                Authorization: token ? `Bearer ${token}` : ''
+                Authorization: `Bearer ${token}`
             }}
-        )    //  FIXME 백주소
+        )   
         .then((res) => {
             alert('예약이 완료되었습니다.');
             setShowReserv(false);
