@@ -15,6 +15,10 @@ import StationDetailPanal from "@/components/StationDetailPanal/StationDetailPan
 import Toast from "@/components/Toast/Toast";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { TfiSearch } from "react-icons/tfi";
+import { AiFillStar } from "react-icons/ai";
+import { AiOutlineStar } from "react-icons/ai";
+import { BsEvStation } from "react-icons/bs";
+
 
 interface Place {
   id: string;
@@ -63,6 +67,7 @@ export default function Home() {
   const searchRef = useRef<HTMLInputElement>(null);                   // 검색어
   // const [places, setPlaces] = useState<Place[]>([]);               // 검색어에 따른 리스트
   const [kakaoMapLoaded, setKakaoMapLoaded] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);                // 즐겨찾기
 
 
   // 1. 충전소 정보를 가져오는 통합 함수
@@ -185,45 +190,7 @@ export default function Home() {
     }
     console.log(nextFilter);
     setCurrentFilter(nextFilter);
-    
-
-    // 카카오API가 로드되었는지 확인하는 kakaoMapLoaded
-    // if(!kakaoMapLoaded){
-    //   alert('지도를 로드하는 중입니다. 잠시후 다시 시도해주세요.');
-    //   return;
-    // }
-    // if(!keyword){
-    //   alert('검색어를 입력하세요')
-    //   return;
-    // }
-
-    // const ps = new window.kakao.maps.service.Places();
-    // ps.keywordSearch(keyword, (data: Place[], status: any, pagination: any) => {
-    //   // 키워드 리스트 추출
-    //   if(status === window.kakao.maps.service.Status.OK ){
-    //     setPlaces(data);
-    //   } else if(status === window.kakao.maps.service.Status.ZERO_RESULT){
-    //     alert('검색 결과가 없습니다.');
-    //     setPlaces([]);
-    //   } else if(status === window.kakao.maps.service.Status.ERROR){
-    //     alert('검색 중 오류가 발생했습니다.');
-    //     setPlaces([]);
-    //   }
-    // });
   }
-
-  // const handlePlaceSelect = (place: Place) => {
-  //   // 선택된 장소 경도, 위도 추출
-  //   const lat = parseFloat(place.y); // 위도
-  //   const lng = parseFloat(place.x); // 경도
-  //   setCurrentFilter((prev) => ({
-  //     ...prev,
-  //     lat,  
-  //     lon: lng,
-  //   }));
-  //   setMyPos([lat, lng]);
-  //   setPlaces([]);  // 검색 결과 목록 숨김
-  // }
 
   // 6. 필터 완료버튼 클릭했을 시_ 필터적용, 모달닫기, 토스트표시
   const handleApplyFilters = (newFilters: Omit<Filters , 'lat' | 'lon' >, msg?: string) => { //Omit<Type, Keys>는 TypeScript의 내장 유틸리티 타입으로, Type(Filters)에서 특정 Keys(lat,lon)를 제거(생략)한 새로운 타입을 생성
@@ -279,11 +246,20 @@ export default function Home() {
     }));
   }
 
+  // 9. 즐겨찾기 추가
+  const handleFavoriteClick = (e: any) => {
+    // 이벤트 버블링을 막아, 즐겨찾기 버튼 클릭 시 카드 전체의 onClick이 실행되지 않도록 합니다.
+    e.stopPropagation(); 
+    setIsFavorite(!isFavorite);
+    // 여기에 실제 즐겨찾기 추가/제거 API 호출 로직을 넣을 수 있습니다.
+    // console.log("Favorite toggled for:", item.statId);
+  };
+
 
   return (
       <div className={style.mainContainer}>
         {/* 왼쪽 */}
-        <div className="w-100 h-full flex flex-col p-10 bg-white z-10 shadow-md">
+        <div className="w-110 h-full flex flex-col p-10 bg-white z-10 shadow-md">
           <div className='flex flex-row justify-between'>
             <h3 className=" font-semibold mb-4" style={{color:"#4FA969"}}> 충전소 찾기</h3>
             <button ref={closeDetailRef} onClick={()=>setIsFilterOpen(true)}
@@ -318,12 +294,74 @@ export default function Home() {
           {/* <h4>충전소 목록</h4> */}
           <ul className="scrollContent">
             {list.map((item) => ( // 🍕 respDummies 로 변경
+              // <li
+              //     className="flex items-center gap-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-400"
+              //     onClick={() => handleStaionClick(item)}
+              //   >
+              //     {/* 왼쪽 아이콘 영역 */}
+              //     <div className="flex items-center justify-center p-3 bg-gray-100 rounded-lg">
+              //       <BsEvStation size={24} className="text-gray-500" />
+              //     </div>
+
+              //     {/* 중앙 정보 영역 (가장 많은 공간 차지) */}
+              //     <div className="flex-1">
+              //       <h4 className="font-bold text-base text-gray-800">{item.statNm}</h4>
+              //       <p className="text-sm text-gray-500 mt-1">{item.addr}</p>
+
+              //       {/* 태그 영역 */}
+              //       <div className="flex items-center gap-2 mt-2">
+              //         <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+              //           item.parkingFree ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+              //         }`}>
+              //           {item.parkingFree ? '무료주차' : '유료주차'}
+              //         </span>
+              //         <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+              //           !item.limitYn ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+              //         }`}>
+              //           {!item.limitYn ? '개방' : '비개방'}
+              //         </span>
+              //       </div>
+              //     </div>
+
+              //     {/* 오른쪽 정보 및 액션 영역 */}
+              //     <div className="flex items-center gap-4">
+              //       {/* 충전기 상태 */}
+              //       <div className="text-right">
+              //         <p className="font-semibold text-gray-700">
+              //           {item.chargeNum} / {item.totalChargeNum}
+              //         </p>
+              //         <p className="text-xs text-gray-400">사용 가능</p>
+              //       </div>
+
+              //       {/* 즐겨찾기 버튼 */}
+              //       <button
+              //         onClick={handleFavoriteClick}
+              //         className="p-2 rounded-full hover:bg-yellow-100 transition-colors"
+              //         aria-label="즐겨찾기"
+              //       >
+              //         {isFavorite ? (
+              //           <AiFillStar size={22} className="text-yellow-400" />
+              //         ) : (
+              //           <AiOutlineStar size={22} className="text-gray-400" />
+              //         )}
+              //       </button>
+              //     </div>
+              //   </li>
               <li key={item.statId} className={style.listSection} onClick={()=>handleStaionClick(item)}>
+                <div className="felx gap-4 text-[12px] ">
+                  <span className="bg-[#EBFAD3] text-[#568811] rounded-full px-2 py-1">
+                    {item.parkingFree ? '무료주차 ' : '유료주차 '}
+                  </span>
+                  <span className="bg-[#EBFAD3] text-[#568811] rounded-full px-2 py-1">
+                    {item.limitYn ? '비개방 ': '개방 '}
+                  </span>
+                </div>
                 <h4 className='text-[15px]' style={{color:'#232323'}}>{item.statNm}</h4>
                 <p className='text-[12px]' style={{color:'#666'}}>{item.addr}</p>
                 <div className='flex gap-3'>
-                  <p className='text-[12px]' style={{color:'#666'}}>
-                    {item.parkingFree ? '무료주차, ' : '유료주차, '} {item.limitYn ? '비개방, ': '개방, '} {item.chargeNum} / { item.totalChargeNum}</p>
+                  <p className='text-[12px] text-[#666]'>
+                    {item.chargeNum} / { item.totalChargeNum}
+                  </p>
                 </div>
               </li>
 

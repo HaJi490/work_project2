@@ -260,7 +260,7 @@ export default function StationDetailPanal({ station, onClose, closeDetailRef }:
 
 
     return (
-        <div ref={panelRef} className="absolute top-125 left-155 h-full -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-20 w-100 max-h-[80vh]">
+        <div ref={panelRef} className="absolute top-135 left-162 h-full -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-20 w-100 max-h-[80vh]">
             <div className='h-full flex flex-col overflow-y-auto relative'>
                 <header className=" ">
                     <div className='flex my-2'>

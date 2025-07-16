@@ -9,10 +9,11 @@ import { useAtom } from "jotai";
 import Toast from "@/components/Toast/Toast";
 import { IoMdHome } from "react-icons/io";
 import Link from "next/link";
-import { accessTokenAtom } from "@/store/auth";
+import { accessTokenAtom, tokenExpireAtAtom } from "@/store/auth";
 
 export default function page() {
   const [, setToken] = useAtom(accessTokenAtom);
+  const [, setTokenExpireAt] = useAtom(tokenExpireAtAtom);
   const [toastMsg, setToastMsg] = useState<string>('');
 
   const [id, setId] = useState('');
@@ -20,7 +21,7 @@ export default function page() {
   
   const route = useRouter();
 
-  // 회원탈퇴 후
+  // 토스트알림_로그아웃, 회원탈퇴 후
   useEffect(()=>{
     const searchParams = new URLSearchParams(window.location.search);
     const toast = searchParams.get('toast');
@@ -42,7 +43,9 @@ export default function page() {
       console.log(token);
 
       if(token){
+        const expireAt = Date.now() + 1000 * 60 * 60 * 2; // 2시간 후 만료
         setToken(token);
+        setTokenExpireAt(expireAt);
       }
 
       route.push('/');

@@ -114,26 +114,6 @@ export interface TimeInfo {
 }
 
 // 충전스케줄링 - 예약정보
-//-------------------------삭제----------------------------
-// export interface MyReservationDto  {
-//   statNm: string;            // 충전소 이름
-//   addr: string;
-//   chgerId: string;           // 충전기 ID
-//   reservDate: string;        // 충전 날짜 (YYYY.MM.DD)
-//   // reservSTime: string;       // 충전 시작 시간 (HH:mm)
-//   // reservETime: string;       // 충전 완료 시간 (HH:mm)
-//   chargeAmount: number;      // 충전량 (kWh)
-//   chargeCost: number;        // 충전 금액
-//   chargeDuration: number;    // 충전 시간 (분)
-//   isReserved: boolean;       // 예약 여부
-//   reservedSTime: string;     // 예약 시작 시간 (HH:mm)
-//   reservedETime: string;     // 예약 완료 시간 (HH:mm)
-//   chgerType: string;         // 충전기 종류
-//   busiNm: string;            // 사업자명
-//   // 결제수단, 충전기위치 등 추가 가능
-// };
-// --------------------------------------------------------
-// 개별 충전소 정보를 위한 타입
 // chargerId 타입
 interface ChargerId {
   statId: string;
@@ -152,7 +132,7 @@ interface StoreInfo {
   enabledCharger: string[];
   busiId: string;
   busiNm: string;
-  chargerNm: number;
+  chargerNm: number | null;
 }
 
 // charger 타입
@@ -163,8 +143,8 @@ export interface Charger {
   storeInfo: StoreInfo;
 }
 
-// 최종적으로 개별 예약 객체의 타입
-export interface Reservation {
+// slot 타입
+export interface Slot {
   timeId: number;
   charger: Charger;
   date: string;
@@ -173,7 +153,17 @@ export interface Reservation {
   enabled: boolean;
 }
 
-// 찐디티오
+// 예약데이터
+export interface Reservation {
+  reserveId: number;
+  username: string;
+  slot: Slot;
+  reserveDate: string;
+  updateDate: string;
+  reseverState: string;
+}
+
+// 찐디티오 ---- 삭제
 export interface MyReservationDto{
   [date: string]: Reservation[];
 }

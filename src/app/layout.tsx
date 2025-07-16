@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {Provider as JotaiProvider} from 'jotai';
 import Script from "next/script";
+
+import TokenExpireWatcher from "@/components/TokenExpireWatcher";
 import Nav from "@/components/Nav/Nav";
 
 const geistSans = Geist({
@@ -48,6 +50,7 @@ export default function RootLayout({
           />
         </header>
           <div className="w-full h-full items-center justify-items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
+            <TokenExpireWatcher/>
             <Nav/>
             {children}
           </div>
