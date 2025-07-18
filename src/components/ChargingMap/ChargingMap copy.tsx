@@ -42,7 +42,7 @@ export default function ChargingMap({ markers, myPos, radius, selectedStationId,
                 console.log('[✅ 지도 API 로드 성공]');
                 const mapOption = {
                     center: new window.kakao.maps.LatLng(myPos[0], myPos[1]),
-                    level: 5,
+                    level: 6,
                 };
 
                 const map = new window.kakao.maps.Map(mapRef.current, mapOption);

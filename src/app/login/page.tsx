@@ -5,11 +5,18 @@ import { useRouter } from "next/navigation";
 import axios from 'axios';
 import Image from "next/image"
 import { useAtom } from "jotai";
+import { accessTokenAtom, tokenExpireAtAtom } from "@/store/auth";
 
 import Toast from "@/components/Toast/Toast";
 import { IoMdHome } from "react-icons/io";
 import Link from "next/link";
-import { accessTokenAtom, tokenExpireAtAtom } from "@/store/auth";
+
+// 토큰 페이로드의 타입 정의
+interface TokenPayload {
+  userId: string;
+  role: 'ADMIN' | 'MEMBER';
+  exp: number;
+}
 
 export default function page() {
   const [, setToken] = useAtom(accessTokenAtom);

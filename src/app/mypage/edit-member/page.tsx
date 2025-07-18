@@ -23,6 +23,7 @@ export default function page() {
 
     useEffect(()=>{
         const getMemberInfo = async () => {
+            console.log(token)
             if (!token) {
                 console.warn('토큰 없음');
                 return;

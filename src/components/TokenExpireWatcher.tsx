@@ -10,6 +10,15 @@ export default function TokenExpireWatcher() {
     const [expireAt, setExpireAt] = useAtom(tokenExpireAtAtom)
     const route = useRouter();
 
+    // 마운트시에도 체크
+    useEffect(() => {
+    if (expireAt && Date.now() > expireAt) {
+        setToken(null);
+        setExpireAt(null);
+        route.push('/login?toast=자동 로그아웃 되었습니다.');
+    }
+    }, []);
+
     // 1. 자동로그아웃 타이머
     useEffect(() => {
         const timer = setInterval(() => {
