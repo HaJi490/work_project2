@@ -1,0 +1,253 @@
+[
+    {
+        "reserveId": 1,
+        "username": "member1",
+        "slot": [
+            {
+                "timeId": 47,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "23:00:00",
+                "endTime": "23:29:59",
+                "enabled": false
+            },
+            {
+                "timeId": 48,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "23:30:00",
+                "endTime": "23:59:59",
+                "enabled": false
+            }
+        ],
+        "reserveDate": "2025-07-18",
+        "updateDate": "2025-07-18",
+        "reseverState": "예약취소"
+    },
+    {
+        "reserveId": 4,
+        "username": "member1",
+        "slot": [
+            {
+                "timeId": 10,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "04:30:00",
+                "endTime": "04:59:59",
+                "enabled": false
+            },
+            {
+                "timeId": 11,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "05:00:00",
+                "endTime": "05:29:59",
+                "enabled": false
+            },
+            {
+                "timeId": 12,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "05:30:00",
+                "endTime": "05:59:59",
+                "enabled": false
+            }
+        ],
+        "reserveDate": "2025-07-18",
+        "updateDate": "2025-07-18",
+        "reseverState": "예약취소"
+    },
+    {
+        "reserveId": 5,
+        "username": "member1",
+        "slot": [
+            {
+                "timeId": 20,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "09:30:00",
+                "endTime": "09:59:59",
+                "enabled": false
+            },
+            {
+                "timeId": 21,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "10:00:00",
+                "endTime": "10:29:59",
+                "enabled": false
+            },
+            {
+                "timeId": 22,
+                "charger": {
+                    "chargerId": {
+                        "statId": "AH000016",
+                        "chgerId": "01"
+                    },
+                    "chgerType": "04",
+                    "output": 50,
+                    "storeInfo": {
+                        "statId": "AH000016",
+                        "statNm": "부산 반여3동 중앙공영주차장",
+                        "addr": "부산광역시 해운대구 재반로 264",
+                        "lat": 35.200384,
+                        "lng": 129.1318321,
+                        "parkingFree": true,
+                        "limitYn": false,
+                        "enabledCharger": [],
+                        "busiId": "AH",
+                        "busiNm": "아하(주)",
+                        "chargerNm": null
+                    }
+                },
+                "date": "2025-07-06",
+                "startTime": "10:30:00",
+                "endTime": "10:59:59",
+                "enabled": false
+            }
+        ],
+        "reserveDate": "2025-07-18",
+        "updateDate": null,
+        "reseverState": "예약완료"
+    }
+]
