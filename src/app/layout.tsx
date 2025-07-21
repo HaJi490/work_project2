@@ -51,7 +51,7 @@ export default function RootLayout({
         </header>
           <div className="w-full h-full items-center justify-items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
             <TokenExpireWatcher/>
-            {/* <Nav/> */}
+            <Nav/>
             {children}
           </div>
         </JotaiProvider>

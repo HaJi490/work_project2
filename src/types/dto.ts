@@ -157,13 +157,13 @@ export interface Slot {
 export interface Reservation {
   reserveId: number;
   username: string;
-  slot: Slot;
+  slot: Slot[];
   reserveDate: string;
   updateDate: string;
-  reseverState: string;
+  reseverState: '예약완료' | '예약취소';
 }
 
-// 찐디티오 ---- 삭제
+// getMyReservation의 전체 응답 타입
 export interface MyReservationDto{
   [date: string]: Reservation[];
 }

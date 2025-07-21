@@ -7,8 +7,7 @@ import { useAtom } from 'jotai';
 import Toast from '@/components/Toast/Toast';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import Calender from '@/components/Calender';
-import { MyReservationDto, Charger, Reservation} from '@/types/dto';
-import { TimeInfo } from '@/types/dto';
+import { MyReservationDto, Charger, Reservation, Slot, TimeInfo} from '@/types/dto';
 import chgerCodeNm from '../../db/chgerType.json';
 import { LuDot } from "react-icons/lu";
 import { IoCalendarClearOutline } from "react-icons/io5";
@@ -17,15 +16,15 @@ import { accessTokenAtom } from '@/store/auth';
 import { TbWashDryP } from 'react-icons/tb';
 
 // 기존 Reservation + key
-interface MergedReservation {
-  key: string; // React 렌더링을 위한 고유 키
-  startTime: string;
-  endTime: string;
-  charger: Charger; 
-  date: string;
-  timeIds: number[];
-  reserveId: number[];
-}
+// interface MergedReservation {
+//   key: string; // React 렌더링을 위한 고유 키
+//   startTime: string;
+//   endTime: string;
+//   charger: Charger; 
+//   date: string;
+//   timeIds: number[];
+//   reserveId: number[];
+// }
 
 // 새로 선택한 슬롯 정보
 interface SelectionSlot {
@@ -43,11 +42,11 @@ export default function page() {
   const [confirmMsg, setConfirmMsg] = useState<string>('');
   const [cofirmSubmsg, setConfirmSubmsg] = useState<string>('');
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-  const [reserveIdsToCancel, setReserveIdsToCancel] = useState<number[]>();       //❗추가됨
+  const [reserveIdsToCancel, setReserveIdsToCancel] = useState<number | null>();   
 
   // ❗예약 수정을 위한 상태
   const [showEditPanel, setShowEditPanel] = useState<boolean>(false);
-  const [reservationToEdit, setReservationToEdit] = useState<MergedReservation | null>(null);
+  const [reservationToEdit, setReservationToEdit] = useState<Reservation | null>(null);
   const [availableTimeslots, setAvailableTimeslots] = useState<TimeInfo[]>();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [currentSelection, setCurrentSelection] = useState<SelectionSlot[]>([]) ;
@@ -83,93 +82,26 @@ export default function page() {
     getMyReservation();
   },[getMyReservation])
 
-   // 2. 예약정보 그루핑 (연속된 시간 병합)
-  const groupConsecutiveReservations = (reservations: Reservation[]): MergedReservation[] => {
-    // 예약 데이터가 없으면 빈 배열을 반환합니다.
-    if (!reservations || reservations.length === 0) {
-      return [];
-    }
-
-    // MergedReservation 생성함수
-    const extractMergedData = (group: Reservation[]) => {
-      const firstSlot = group[0];
-      const lastSlot = group[group.length - 1];
-      return {
-        key: `${firstSlot.slot.timeId}-${lastSlot.slot.timeId}`,
-        startTime: firstSlot.slot.startTime,
-        endTime: lastSlot.slot.endTime,
-        charger: firstSlot.slot.charger,
-        date: firstSlot.slot.date,
-        timeIds: group.map((r) => r.slot.timeId), // 여기에 모든 timeId 배열 추가
-        reserveId: group.map((r) => r.reserveId),
-      };
-    };
-
-    // 2-1. timeId 기준으로 데이터를 정렬합니다. (가장 중요!)
-    const sorted = [...reservations].sort((a, b) => a.slot.timeId - b.slot.timeId);
-
-    const mergedList: MergedReservation[] = [];
-    
-    // 첫 번째 예약을 기준으로 첫 그룹을 시작합니다.
-    let currentGroup: Reservation[] = [sorted[0]];
-
-    // 2-2. 두 번째 예약부터 순회합니다.
-    for (let i = 1; i < sorted.length; i++) {
-      const currentRes = sorted[i];
-      const lastResInGroup = currentGroup[currentGroup.length - 1];
-
-      const isConsecutive = currentRes.slot.timeId === lastResInGroup.slot.timeId + 1;  // timeId 연속성확인
-      const isSameState = currentRes.reseverState === lastResInGroup.reseverState;      // reserveState 동일성확인
-
-      // 2-3. timeId, reserveState를 비교하여 연속성 검사
-      if (isConsecutive && isSameState) {
-        // 연속된다면, 현재 그룹에 추가하기만 합니다.
-        currentGroup.push(currentRes);
-      } else {
-        // 4. 연속이 끊겼을 때:
-        // 이전까지의 그룹을 최종 리스트에 추가합니다.
-        const firstSlot = currentGroup[0];
-        const lastSlot = currentGroup[currentGroup.length - 1];
-        mergedList.push(extractMergedData(currentGroup));
-        // 현재 항목으로 새로운 그룹을 시작합니다.
-        currentGroup = [currentRes];
-      }
-    }
-
-    // 2-5. 루프가 끝난 후, 마지막으로 남아있는 그룹을 처리합니다.
-    if (currentGroup.length > 0) {
-      const firstSlot = currentGroup[0];
-      const lastSlot = currentGroup[currentGroup.length - 1];
-      mergedList.push(extractMergedData(currentGroup));
-    }
-
-    return mergedList;
-  };
-
-  // 22. useMemo를 사용해 myReserv 데이터가 바뀔 때만 그룹핑을 다시 계산합니다.
+  // 2. useMemo를 사용해 myReserv 데이터가 바뀔 때만 필터링
   const groupedReservations = useMemo(() => {
-    const newGroupedData: Record<string, MergedReservation[]> = {};
-    
-    // 날짜별로 루프를 돌며 그룹핑 함수를 적용합니다.
-    for (const date in myReserv) {
-      // 1. viewMode 상태에 따라 원본 데이터를 먼저 필터링합니다.
-      const filteredList = myReserv[date].filter(
-        (reservation) => reservation.reseverState === viewMode
-      );
+    const newFilteredData : Record<string, Reservation[]> = {};
+    if(!myReserv) return newFilteredData;
 
-      // 2. 필터링된 목록을 그룹핑 함수에 전달합니다.
-      if (filteredList.length > 0) {
-        newGroupedData[date] = groupConsecutiveReservations(filteredList);
+    for(const date in myReserv){
+      const filteredList = myReserv[date].filter(
+        (reservation) => reservation.reseverState === viewMode);
+      if(filteredList.length > 0){
+        newFilteredData[date] = filteredList;
       }
-      // newGroupedData[date] = groupConsecutiveReservations(myReserv[date]);
     }
-    console.log('재배열 데이터: ', newGroupedData);
-    return newGroupedData;
+
+    console.log('필터링된 데이터: ', newFilteredData);
+    return newFilteredData;
   }, [myReserv, viewMode]);
 
 
   // 3. 예약취소 함수들
-  const handleConfirmModal = (reserveId: number[]) =>{ //🔥
+  const handleConfirmModal = (reserveId: number) =>{ //🔥
     setShowConfirmModal(true);
     setReserveIdsToCancel(reserveId);  //🔥
     setConfirmMsg('예약을 취소하시겠습니까?');
@@ -180,7 +112,7 @@ export default function page() {
   const handleCancelReserv = async() => {
     try{
       if (!token || !reserveIdsToCancel) { //🔥
-          console.warn('토큰 없음');
+          console.warn('토큰이 없거나 취소할 reservId없음');
           return;
       }
 
@@ -200,7 +132,7 @@ export default function page() {
       console.log('getMyReservation 에러: ', error)
       setToastMsg('예약취소가 실패하였습니다. 다시 시도해주세요.')
     } finally{
-      setReserveIdsToCancel([]);
+      setReserveIdsToCancel(null);
       await getMyReservation();
     }
   }
@@ -208,25 +140,27 @@ export default function page() {
   // 4. 예약수정 함수들
   
   // 4-1. 특정날짜의 타임슬롯 정보 가져오기
-  const fetchTimeslotsForEdit = useCallback(async (charger: Charger, date: string, reservation?: MergedReservation)=> {
+  const fetchTimeslotsForEdit = useCallback(async (reservation: Reservation)=> { //📍
+    const firstSlot = reservation.slot[0];
+    if(!firstSlot) return;
+
     try{
       const res = await axios.post<TimeInfo[]>(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/time/timeslots`, {
-        statId: charger.storeInfo.statId,
-        chgerId: charger.chargerId.chgerId,
-        date: date,
+        statId: firstSlot.charger.storeInfo.statId,
+        chgerId: firstSlot.charger.chargerId.chgerId,
+        date: firstSlot.date,
       });
       setAvailableTimeslots(res.data);
 
       // 타임슬롯을 가져온 후, '현재 수정중인 예약'을 기반으로 'currentSelection'상태를 초기화
-      if(reservation){
-        const initialSelection = res.data.filter(slot => reservation.timeIds.includes(slot.timeId))
-                                        .map(slot => ({
-                                            timeId: slot.timeId,
-                                            startTime: slot.startTime,
-                                            endTime: slot.endTime,
-                                          }));
-        setCurrentSelection(initialSelection);
-      }       
+      const initialSelection = res.data
+          .filter(slot => reservation.slot.some(s=> s.timeId === slot.timeId))
+          .map(slot => ({
+              timeId: slot.timeId,
+              startTime: slot.startTime,
+              endTime: slot.endTime,
+            }));
+      setCurrentSelection(initialSelection);
     } catch(error) {
       console.error('fetchTimeslotsForEdit 에러: ', error);
       setToastMsg('예약현황을 불러오는데 실패했습니다.')
@@ -234,87 +168,89 @@ export default function page() {
   },[reservationToEdit]); 
 
   // 4-2. 수정패널 열기
-  const handleOpenEditPanel = (reservation: MergedReservation) => {
+  const handleOpenEditPanel = (reservation: Reservation) => {
     setReservationToEdit(reservation);
     setShowEditPanel(true);
-    const reservationDate = new Date(reservation.date);
+    const reservationDate = new Date(reservation.slot[0].date);
     setSelectedDate(reservationDate);
-    fetchTimeslotsForEdit(reservation.charger, reservation.date, reservation);
+    fetchTimeslotsForEdit(reservation);
   }
 
   // 4-3. 캘린더에서 날짜 변경시
-  const handleDateChange = (date:Date) => {
-    if(!reservationToEdit) return;
-    const formattedDate = date.toISOString().split('T')[0];
-    setSelectedDate(date);
-    fetchTimeslotsForEdit(reservationToEdit.charger, formattedDate);
-    setCurrentSelection([]); // 날짜가 바뀌면 선택 초기화
-  }
+  // const handleDateChange = (date:Date) => {
+  //   if(!reservationToEdit) return;
+  //   const formattedDate = date.toISOString().split('T')[0];
+  //   setSelectedDate(date);
+  //   fetchTimeslotsForEdit(reservationToEdit.charger, formattedDate);
+  //   setCurrentSelection([]); // 날짜가 바뀌면 선택 초기화
+  // }
 
-  // 4-4. 연속성 검사함수
-  const isConsecutive = (arr: number[]) => {
-    if(arr.length <= 1) return true;
-    const sorted = [...arr].sort((a, b) => a - b);
-    for(let i = 1 ; i < sorted.length; i++){
-      if(sorted[i] !== sorted[i-1] + 1){
-        return false;
-      }
-    }
-    return true;
-  }
+  // // 4-4. 연속성 검사함수
+  // // const isConsecutive = (arr: number[]) => {
+  // //   if(arr.length <= 1) return true;
+  // //   const sorted = [...arr].sort((a, b) => a - b);
+  // //   for(let i = 1 ; i < sorted.length; i++){
+  // //     if(sorted[i] !== sorted[i-1] + 1){
+  // //       return false;
+  // //     }
+  // //   }
+  // //   return true;
+  // // }
 
-  // 4-5. 타임슬록 선택/해제 및 연속성 검사 핸들러
-  const handleToggleSlot = (slot: TimeInfo) => {
-    const isAlreadySelected = currentSelection.some(s => s.timeId === slot.timeId);
-    let potentialSelection: SelectionSlot[];
+  // // 4-5. 타임슬록 선택/해제 및 연속성 검사 핸들러
+  // const handleToggleSlot = (slot: TimeInfo) => {
+  //   const isAlreadySelected = currentSelection.some(s => s.timeId === slot.timeId);
+  //   let potentialSelection: SelectionSlot[];
 
-    if (isAlreadySelected){
-      // 선택 해제
-      potentialSelection = currentSelection.filter(s => s.timeId !== slot.timeId);
-    }else{
-      // 새로 선택
-      const isMyOriginalSlot = reservationToEdit?.timeIds.includes(slot.timeId);
-      if(!slot.enabled && !isMyOriginalSlot){
-        setToastMsg('예약이 불가능한 시간입니다.');
-        return;
-      }
-      potentialSelection = [...currentSelection, {timeId: slot.timeId, startTime: slot.startTime, endTime: slot.endTime}];
-    }
+  //   if (isAlreadySelected){
+  //     // 선택 해제
+  //     potentialSelection = currentSelection.filter(s => s.timeId !== slot.timeId);
+  //   }else{
+  //     // 새로 선택
+  //     const isMyOriginalSlot = reservationToEdit?.timeIds.includes(slot.timeId);
+  //     if(!slot.enabled && !isMyOriginalSlot){
+  //       setToastMsg('예약이 불가능한 시간입니다.');
+  //       return;
+  //     }
+  //     potentialSelection = [...currentSelection, {timeId: slot.timeId, startTime: slot.startTime, endTime: slot.endTime}];
+  //   }
 
-    // '만약 이렇게 선택된다면'을 가정하고 연속성 검사
-    const potentialTimeIds = potentialSelection.map(s => s.timeId);
-    if (isConsecutive(potentialTimeIds)) {
-        // 연속이 맞으면 상태 업데이트
-        setCurrentSelection(potentialSelection.sort((a, b) => a.timeId - b.timeId));
-    } else {
-        // 연속이 아니면 에러 메시지 표시하고 상태는 변경하지 않음
-        setToastMsg('연속된 시간대만 선택할 수 있습니다.');
-    }
-  };
+  //   // '만약 이렇게 선택된다면'을 가정하고 연속성 검사
+  //   const potentialTimeIds = potentialSelection.map(s => s.timeId);
+  //   if (isConsecutive(potentialTimeIds)) {
+  //       // 연속이 맞으면 상태 업데이트
+  //       setCurrentSelection(potentialSelection.sort((a, b) => a.timeId - b.timeId));
+  //   } else {
+  //       // 연속이 아니면 에러 메시지 표시하고 상태는 변경하지 않음
+  //       setToastMsg('연속된 시간대만 선택할 수 있습니다.');
+  //   }
+  // };
 
   // 4-6. 최적화된 예약변경 확정 로직
   const handleUpdateReservation = async() => {
     if(!reservationToEdit) return;
 
     // 만약 변경된 내용이 없다면 함수 종료
-    const originalIds = reservationToEdit.timeIds.sort().join(',');
-    const newIds = currentSelection.map(s => s.timeId).sort().join(',');
+    const originalTimeIds = reservationToEdit.slot.map(s=> s.timeId).sort().join(',');
+    const newTimeIds = currentSelection.map(s => s.timeId).sort().join(',');
 
-    if (originalIds === newIds) {
+    if (originalTimeIds === newTimeIds) {
       setToastMsg("변경된 내용이 없습니다.");
       return;
     }
 
     try{
         await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reserve/setslotsCancel`,
-          { slotIds: reservationToEdit.timeIds }, 
+          { slotIds: reservationToEdit.reserveId  }, 
           { headers: { Authorization: `Bearer ${token}` } });
+        
+        // 새롭게 선택된 슬롯이 있다면 예약
         if(currentSelection.length > 0){
           await axios.post(`http://${process.env.NEXT_PUBLIC_BACKIP}:8080/reserve/setSlots`,
           { slotIds: currentSelection.map(s => s.timeId) }, 
           { headers: { Authorization: `Bearer ${token}` } });
         }
-
+      // ------------------------------------------------------------------------여기까지 수정(React Component: Reservation Handling)---------------------------------------
       setToastMsg('예약이 성공적으로 변경되었습니다.');
       setShowEditPanel(false);
       await getMyReservation();
