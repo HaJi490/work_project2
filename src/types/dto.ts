@@ -147,7 +147,7 @@ export interface Charger {
 export interface Slot {
   timeId: number;
   charger: Charger;
-  date: string;
+  date: string; // 충전하는 날짜
   startTime: string;
   endTime: string;
   enabled: boolean;
@@ -158,7 +158,7 @@ export interface Reservation {
   reserveId: number;
   username: string;
   slot: Slot[];
-  reserveDate: string;
+  reserveDate: string;  // 내가 예약한 날짜
   updateDate: string;
   reseverState: '예약완료' | '예약취소';
 }
