@@ -13,7 +13,7 @@ import { FiLogOut } from "react-icons/fi";
 import Link from 'next/link';
 import { setLazyProp } from 'next/dist/server/api-utils';
 import { accessTokenAtom, isLoggedInAtom } from '@/store/auth';
-
+import { deleteCookie } from 'cookies-next';
 
 export default function Nav() {
   const route = useRouter();
@@ -32,6 +32,8 @@ export default function Nav() {
   const handleLogout = () => {
     setToken(null);
     // alert("로그아웃 되었습니다.");
+    localStorage.removeItem('accessToken');
+    deleteCookie('jwtToken');
     route.push('/login?toast=로그아웃 되었습니다.');
   };
 
